@@ -1,11 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export interface AppState {
-	theme: "LIGHT" | "DARK";
+	theme: "light" | "dark";
 }
 
 const initialState: AppState = {
-	theme: "LIGHT",
+	theme: "light",
 };
 
 export const appSlice = createSlice({
