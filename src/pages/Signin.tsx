@@ -1,8 +1,47 @@
 import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 import { Box, Button, Card, CardContent, Container, TextField, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { axiosInstance } from "../api/axiosInstance";
+import { openSnackbarAlert } from "../redux/appSlice";
+import { useAppDispatch } from "../redux/hooks";
+import { setCurrentUser } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Signin: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+  };
+
+  const handleClickSignin = async () => {
+    setLoading(true);
+
+    try {
+      const { data } = await axiosInstance.post("/auth/signin", JSON.stringify(formData));
+
+      setLoading(false);
+      dispatch(setCurrentUser(data.data));
+      dispatch(openSnackbarAlert({ severity: "success", message: data.message }));
+      navigate("/dashboard");
+    } catch (error: any) {
+      setLoading(false);
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
+  let disableSigninBtn = true;
+
+  if (formData.email && formData.password && !loading) {
+    disableSigninBtn = false;
+  }
+
   return (
     <Container maxWidth='lg'>
       <Box py={8}>
@@ -27,11 +66,37 @@ const Signin: React.FC = () => {
             <Card variant='outlined'>
               <CardContent>
                 <Box display='flex' flexDirection='column' gap={2}>
-                  <TextField required fullWidth type='text' variant='standard' label='Username' size='small' />
-                  <TextField required fullWidth type='password' variant='standard' label='Password' size='small' />
+                  <TextField
+                    required
+                    fullWidth
+                    type='text'
+                    variant='standard'
+                    name='email'
+                    label='Email'
+                    size='small'
+                    value={formData.email}
+                    onChange={handleChange}
+                  />
+                  <TextField
+                    required
+                    fullWidth
+                    type='password'
+                    variant='standard'
+                    name='password'
+                    label='Password'
+                    size='small'
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
 
-                  <Button size='small' variant='contained' disableElevation>
-                    Sign in me
+                  <Button
+                    size='small'
+                    variant='contained'
+                    disableElevation
+                    disabled={disableSigninBtn}
+                    onClick={handleClickSignin}
+                  >
+                    {loading ? "Signing in..." : "Sign in me"}
                     <ArrowForwardOutlinedIcon fontSize='small' sx={{ ml: 1 }} />
                   </Button>
                 </Box>
