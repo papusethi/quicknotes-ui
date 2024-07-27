@@ -1,7 +1,18 @@
 import { Box, Button, Typography } from "@mui/material";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Header: React.FC = () => {
+	const navigate = useNavigate();
+
+	const handleClickSignin = () => {
+		navigate("/signin");
+	};
+
+	const handleClickCreateAccount = () => {
+		navigate("/signup");
+	};
+
 	return (
 		<Box
 			py={2}
@@ -88,8 +99,15 @@ const Header: React.FC = () => {
 				alignItems='center'
 				gap={1}
 			>
-				<Button size='small'>Sign in</Button>
-				<Button size='small' variant='contained' disableElevation>
+				<Button size='small' onClick={handleClickSignin}>
+					Sign in
+				</Button>
+				<Button
+					size='small'
+					variant='contained'
+					disableElevation
+					onClick={handleClickCreateAccount}
+				>
 					Create an account
 				</Button>
 			</Box>

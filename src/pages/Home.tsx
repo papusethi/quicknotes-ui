@@ -21,7 +21,7 @@ import Header from "../components/Header";
 
 const Home: React.FC = () => {
 	return (
-		<Container>
+		<Container maxWidth='lg'>
 			<Header />
 
 			<Divider />
@@ -329,7 +329,7 @@ const Home: React.FC = () => {
 			<Divider />
 
 			{/* Footer section */}
-			<Container>
+			<Container maxWidth='lg'>
 				<Box py={8}>
 					<Box
 						display='flex'
@@ -553,7 +553,7 @@ const Home: React.FC = () => {
 			<Divider />
 
 			{/* Copyright section */}
-			<Container>
+			<Container maxWidth='lg'>
 				<Box py={2}>
 					<Box
 						display='flex'
