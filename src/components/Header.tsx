@@ -11,7 +11,75 @@ const Header: React.FC = () => {
 			alignItems='center'
 		>
 			<Box>
-				<Typography variant='h5'>QuikNotes.</Typography>
+				<Typography
+					component='a'
+					href='/#'
+					variant='h5'
+					color='inherit'
+					sx={{ textDecoration: "none" }}
+				>
+					QuikNotes.
+				</Typography>
+			</Box>
+			<Box>
+				<ul
+					style={{
+						margin: 0,
+						listStyleType: "none",
+						display: "flex",
+						flexDirection: "row",
+						gap: 16,
+					}}
+				>
+					<li>
+						<Typography
+							component='a'
+							href='#services'
+							variant='body2'
+							color='inherit'
+							sx={{
+								textDecoration: "none",
+								"&:hover": {
+									textDecoration: "underline",
+								},
+							}}
+						>
+							Services
+						</Typography>
+					</li>
+					<li>
+						<Typography
+							component='a'
+							href='#plans-and-features'
+							variant='body2'
+							color='inherit'
+							sx={{
+								textDecoration: "none",
+								"&:hover": {
+									textDecoration: "underline",
+								},
+							}}
+						>
+							Plans & Features
+						</Typography>
+					</li>
+					<li>
+						<Typography
+							component='a'
+							href='#collaborations'
+							variant='body2'
+							color='inherit'
+							sx={{
+								textDecoration: "none",
+								"&:hover": {
+									textDecoration: "underline",
+								},
+							}}
+						>
+							Collaborations
+						</Typography>
+					</li>
+				</ul>
 			</Box>
 			<Box
 				display='flex'

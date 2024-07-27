@@ -2,6 +2,9 @@ import ArchitectureOutlinedIcon from "@mui/icons-material/ArchitectureOutlined";
 import ArrowOutwardIcon from "@mui/icons-material/ArrowOutward";
 import DesignServicesOutlinedIcon from "@mui/icons-material/DesignServicesOutlined";
 import DrawOutlinedIcon from "@mui/icons-material/DrawOutlined";
+import GitHubIcon from "@mui/icons-material/GitHub";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import PlayCircleOutlinedIcon from "@mui/icons-material/PlayCircleOutlined";
 import {
 	Box,
@@ -20,6 +23,7 @@ const Home: React.FC = () => {
 	return (
 		<Container>
 			<Header />
+
 			<Divider />
 
 			{/* Hero section */}
@@ -41,10 +45,10 @@ const Home: React.FC = () => {
 								fontSize='small'
 								sx={{ marginRight: 1 }}
 							/>
-							Get Demo
+							Get demo
 						</Button>
 						<Button variant='contained' size='small' disableElevation>
-							Create a Note
+							Create a note
 						</Button>
 					</Box>
 				</Box>
@@ -53,7 +57,7 @@ const Home: React.FC = () => {
 			<Divider />
 
 			{/* Services section */}
-			<Container maxWidth='md'>
+			<Container maxWidth='md' id='services'>
 				<Box py={8}>
 					<Typography variant='h4' fontWeight={500} textAlign='center'>
 						Services
@@ -124,13 +128,13 @@ const Home: React.FC = () => {
 			<Divider />
 
 			{/* Pricing section */}
-			<Container maxWidth='md'>
+			<Container maxWidth='md' id='plans-and-features'>
 				<Box py={8}>
 					<Typography variant='h4' fontWeight={500} textAlign='center'>
 						Plans & Features
 					</Typography>
 					<Typography textAlign='center'>
-						pick your plans and explore the features
+						pick your plan and explore the features
 					</Typography>
 					<Box mt={4} display='flex' justifyContent='center' gap={2}>
 						<Box flex={1}>
@@ -225,7 +229,7 @@ const Home: React.FC = () => {
 										justifyContent='space-between'
 									>
 										<Typography variant='h6' fontWeight={500}>
-											Professional
+											Premium
 										</Typography>
 										<Chip
 											label='$0.25/month'
@@ -326,7 +330,224 @@ const Home: React.FC = () => {
 
 			{/* Footer section */}
 			<Container>
-				<Box py={8}></Box>
+				<Box py={8}>
+					<Box
+						display='flex'
+						flexDirection='row'
+						justifyContent='space-between'
+					>
+						<Box>
+							<Typography
+								component='a'
+								href='/#'
+								variant='h4'
+								color='inherit'
+								sx={{ textDecoration: "none" }}
+							>
+								QuikNotes.
+							</Typography>
+							<Typography variant='body2' textAlign='center'>
+								access thoughts anywhere, anytime
+							</Typography>
+
+							<Box
+								py={4}
+								display='flex'
+								flexDirection='row'
+								alignItems='center'
+								gap={2}
+							>
+								<Typography
+									component='a'
+									href='https://www.linkedin.com/in/papusethi'
+									title='Follow us on LinkedIn'
+									target='_blank'
+									referrerPolicy='no-referrer'
+									color='inherit'
+									sx={{
+										transition: "all 0.3s ease",
+										"&:hover": { transform: "scale(1.2)" },
+									}}
+								>
+									<LinkedInIcon />
+								</Typography>
+								<Typography
+									component='a'
+									href='https://www.instagram.com/_papusethi_'
+									title='Follow us on Instagram'
+									target='_blank'
+									referrerPolicy='no-referrer'
+									color='inherit'
+									sx={{
+										transition: "all 0.3s ease",
+										"&:hover": { transform: "scale(1.2)" },
+									}}
+								>
+									<InstagramIcon />
+								</Typography>
+								<Typography
+									component='a'
+									href='https://github.com/papusethi'
+									title='Follow us on Github'
+									target='_blank'
+									referrerPolicy='no-referrer'
+									color='inherit'
+									sx={{
+										transition: "all 0.3s ease",
+										"&:hover": { transform: "scale(1.2)" },
+									}}
+								>
+									<GitHubIcon />
+								</Typography>
+							</Box>
+						</Box>
+						<Box>
+							<Typography variant='h6' textAlign='center'>
+								Services
+							</Typography>
+							<ul>
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										QuikNote
+									</Typography>
+								</li>
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										QuikDraw
+									</Typography>
+								</li>
+
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										QuikDesign
+									</Typography>
+								</li>
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										QuikJam
+									</Typography>
+								</li>
+							</ul>
+						</Box>
+						<Box>
+							<Typography variant='h6' textAlign='center'>
+								More info
+							</Typography>
+							<ul>
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										About us
+									</Typography>
+								</li>
+
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										Our team
+									</Typography>
+								</li>
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										Colloaboration
+									</Typography>
+								</li>
+								<li>
+									<Typography
+										component='a'
+										href='#services'
+										variant='body2'
+										color='inherit'
+										sx={{
+											textDecoration: "none",
+											"&:hover": {
+												textDecoration: "underline",
+											},
+										}}
+									>
+										Privacy policies
+									</Typography>
+								</li>
+							</ul>
+						</Box>
+						<Box></Box>
+					</Box>
+				</Box>
 			</Container>
 
 			<Divider />
@@ -334,9 +555,36 @@ const Home: React.FC = () => {
 			{/* Copyright section */}
 			<Container>
 				<Box py={2}>
-					<Typography variant='body2'>
-						&copy; Copyright 2024 | All Rights Reserved.
-					</Typography>
+					<Box
+						display='flex'
+						flexDirection='row'
+						justifyContent='space-between'
+						alignItems='center'
+					>
+						<Typography variant='body2'>
+							&copy; Copyright 2024 | All Rights Reserved.
+						</Typography>
+
+						<Typography variant='body2'>
+							Made with 💙 by{" "}
+							<Typography
+								variant='body2'
+								component='a'
+								href='https://papusethi.github.io/portfolio'
+								target='_blank'
+								referrerPolicy='no-referrer'
+								sx={{
+									color: "inherit",
+									textDecoration: "none",
+									"&:hover": {
+										textDecoration: "underline",
+									},
+								}}
+							>
+								Papu Sethi
+							</Typography>
+						</Typography>
+					</Box>
 				</Box>
 			</Container>
 		</Container>
