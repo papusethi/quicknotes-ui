@@ -16,14 +16,12 @@ const Signup: React.FC = () => {
   };
 
   const handleClickSignup = () => {
-    dispatch(openSnackbarAlert({ severity: "success", message: "Signup successfully" }));
+    if (formData.username && formData.email && formData.password) {
+      dispatch(openSnackbarAlert({ severity: "success", message: "Signup successfully" }));
+    } else {
+      dispatch(openSnackbarAlert({ severity: "error", message: "Please enter the details" }));
+    }
   };
-
-  let disableSignupBtn = true;
-
-  if (formData.username && formData.password) {
-    disableSignupBtn = false;
-  }
 
   return (
     <Container maxWidth='lg'>
@@ -83,13 +81,7 @@ const Signup: React.FC = () => {
                     onChange={handleChange}
                   />
 
-                  <Button
-                    size='small'
-                    variant='contained'
-                    disableElevation
-                    disabled={disableSignupBtn}
-                    onClick={handleClickSignup}
-                  >
+                  <Button size='small' variant='contained' disableElevation onClick={handleClickSignup}>
                     Create my account
                     <ArrowForwardOutlinedIcon fontSize='small' sx={{ ml: 1 }} />
                   </Button>

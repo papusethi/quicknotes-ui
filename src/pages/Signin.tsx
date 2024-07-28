@@ -21,26 +21,24 @@ const Signin: React.FC = () => {
   };
 
   const handleClickSignin = async () => {
-    setLoading(true);
+    if (formData.email && formData.password) {
+      setLoading(true);
 
-    try {
-      const { data } = await axiosInstance.post("/auth/signin", JSON.stringify(formData));
+      try {
+        const { data } = await axiosInstance.post("/auth/signin", JSON.stringify(formData));
 
-      setLoading(false);
-      dispatch(setCurrentUser(data.data));
-      dispatch(openSnackbarAlert({ severity: "success", message: data.message }));
-      navigate("/dashboard");
-    } catch (error: any) {
-      setLoading(false);
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+        setLoading(false);
+        dispatch(setCurrentUser(data.data));
+        dispatch(openSnackbarAlert({ severity: "success", message: data.message }));
+        navigate("/dashboard");
+      } catch (error: any) {
+        setLoading(false);
+        dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+      }
+    } else {
+      dispatch(openSnackbarAlert({ severity: "error", message: "Please enter your details" }));
     }
   };
-
-  let disableSigninBtn = true;
-
-  if (formData.email && formData.password && !loading) {
-    disableSigninBtn = false;
-  }
 
   return (
     <Container maxWidth='lg'>
@@ -89,13 +87,7 @@ const Signin: React.FC = () => {
                     onChange={handleChange}
                   />
 
-                  <Button
-                    size='small'
-                    variant='contained'
-                    disableElevation
-                    disabled={disableSigninBtn}
-                    onClick={handleClickSignin}
-                  >
+                  <Button size='small' variant='contained' disableElevation onClick={handleClickSignin}>
                     {loading ? "Signing in..." : "Sign in me"}
                     <ArrowForwardOutlinedIcon fontSize='small' sx={{ ml: 1 }} />
                   </Button>
