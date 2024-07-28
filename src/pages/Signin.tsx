@@ -87,7 +87,13 @@ const Signin: React.FC = () => {
                     onChange={handleChange}
                   />
 
-                  <Button size='small' variant='contained' disableElevation onClick={handleClickSignin}>
+                  <Button
+                    size='small'
+                    variant='contained'
+                    disableElevation
+                    disabled={loading}
+                    onClick={handleClickSignin}
+                  >
                     {loading ? "Signing in..." : "Sign in me"}
                     <ArrowForwardOutlinedIcon fontSize='small' sx={{ ml: 1 }} />
                   </Button>

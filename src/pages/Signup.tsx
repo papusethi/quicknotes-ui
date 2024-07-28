@@ -1,12 +1,16 @@
 import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 import { Box, Button, Card, CardContent, Container, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { axiosInstance } from "../api/axiosInstance";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch } from "../redux/hooks";
 
 const Signup: React.FC = () => {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ username: "", email: "", password: "" });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,9 +19,19 @@ const Signup: React.FC = () => {
     setFormData(newFormData);
   };
 
-  const handleClickSignup = () => {
+  const handleClickSignup = async () => {
     if (formData.username && formData.email && formData.password) {
-      dispatch(openSnackbarAlert({ severity: "success", message: "Signup successfully" }));
+      setLoading(true);
+      try {
+        const { data } = await axiosInstance.post("/auth/signup", JSON.stringify(formData));
+
+        setLoading(false);
+        dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
+        navigate("/signin");
+      } catch (error: any) {
+        setLoading(false);
+        dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+      }
     } else {
       dispatch(openSnackbarAlert({ severity: "error", message: "Please enter the details" }));
     }
@@ -81,8 +95,14 @@ const Signup: React.FC = () => {
                     onChange={handleChange}
                   />
 
-                  <Button size='small' variant='contained' disableElevation onClick={handleClickSignup}>
-                    Create my account
+                  <Button
+                    size='small'
+                    variant='contained'
+                    disableElevation
+                    disabled={loading}
+                    onClick={handleClickSignup}
+                  >
+                    {loading ? "Creating your account..." : "Create my account"}
                     <ArrowForwardOutlinedIcon fontSize='small' sx={{ ml: 1 }} />
                   </Button>
                 </Box>
