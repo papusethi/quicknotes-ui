@@ -19,6 +19,7 @@ import { axiosInstance } from "../api/axiosInstance";
 import NewNote from "../components/NewNote";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { setSavedNotes } from "../redux/userSlice";
 
 export interface INote {
   _id: string;
@@ -33,18 +34,18 @@ const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const savedNotes = useAppSelector((state) => state.user.savedNotes);
 
   const [isOpenNoteDialog, setIsOpenNoteDialog] = useState(false);
-  const [notesData, setNotesData] = useState<INote[]>([]);
 
   useEffect(() => {
     const fetchAllNotes = async () => {
       const { data } = await axiosInstance.get("/note");
-      setNotesData(data?.data || []);
+      dispatch(setSavedNotes(data?.data));
     };
 
     fetchAllNotes();
-  }, []);
+  }, [dispatch]);
 
   const handleOpenNewNote = () => {
     setIsOpenNoteDialog(true);
@@ -57,16 +58,18 @@ const Dashboard: React.FC = () => {
   const handleClickDeleteNote = async (noteId: string) => {
     try {
       const { data } = await axiosInstance.delete(`/note/${noteId}`);
+      dispatch(setSavedNotes(data?.data));
       dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
   };
 
-  const handleClickPinNote = async (note: (typeof notesData)[0]) => {
+  const handleClickPinNote = async (note: INote) => {
     const updateNote = { ...note, isPinned: !note.isPinned };
     try {
       const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      dispatch(setSavedNotes(data?.data));
       dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
@@ -96,7 +99,6 @@ const Dashboard: React.FC = () => {
         <Box display='flex' flexDirection='row' justifyContent='space-between' gap={1}>
           <Box>
             <Typography variant='h6'>All your notes</Typography>
-            <Typography variant='body2'>quick filters</Typography>
           </Box>
 
           <Box>
@@ -107,9 +109,9 @@ const Dashboard: React.FC = () => {
           </Box>
         </Box>
 
-        {notesData?.length > 0 ? (
+        {Array.isArray(savedNotes) && savedNotes.length > 0 ? (
           <Box mt={2} display='grid' gap={1} gridTemplateColumns={"repeat(3, 1fr)"}>
-            {notesData?.map((note) => {
+            {savedNotes?.map((note) => {
               const { _id, title, description, tags, isPinned } = note;
 
               return (

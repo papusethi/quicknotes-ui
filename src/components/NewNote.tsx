@@ -16,6 +16,7 @@ import { axiosInstance } from "../api/axiosInstance";
 import { INote } from "../pages/Dashboard";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { setSavedNotes } from "../redux/userSlice";
 
 interface INewNoteProps {
   onClose: () => void;
@@ -54,9 +55,17 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
   };
 
   const handleClickAddTag = () => {
-    const updatedData = { ...newNoteData, tags: [...newNoteData.tags, tagInput] };
+    if (tagInput?.trim() && !newNoteData?.tags?.includes(tagInput)) {
+      const updatedData = { ...newNoteData, tags: [...newNoteData.tags, tagInput] };
+      setNewNoteData(updatedData);
+      setTagInput("");
+    }
+  };
+
+  const handleClickDeleteTag = (tag: string) => {
+    const updatedTags = newNoteData?.tags?.filter((item) => item !== tag);
+    const updatedData = { ...newNoteData, tags: updatedTags };
     setNewNoteData(updatedData);
-    setTagInput("");
   };
 
   const handleClickSaveNewNote = async () => {
@@ -64,7 +73,7 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
       const newNote = { ...newNoteData, userId: currentUser?._id };
       try {
         const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
-        console.log("data", data);
+        dispatch(setSavedNotes(data?.data));
         dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
         onClose();
       } catch (error: any) {
@@ -135,7 +144,14 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
 
           <Box display='flex' flexDirection='row' flexWrap='wrap' gap={1}>
             {newNoteData?.tags?.map((tag) => (
-              <Chip key={tag} label={tag} size='small' color='default' variant='outlined' />
+              <Chip
+                key={tag}
+                label={tag}
+                size='small'
+                color='default'
+                variant='outlined'
+                onDelete={() => handleClickDeleteTag(tag)}
+              />
             ))}
           </Box>
         </Box>
