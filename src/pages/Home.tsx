@@ -9,6 +9,7 @@ import PlayCircleOutlinedIcon from "@mui/icons-material/PlayCircleOutlined";
 import { Box, Button, Card, CardContent, Chip, Container, Divider, Typography } from "@mui/material";
 import React from "react";
 import Header from "../components/Header";
+import { StyledLink } from "../components/styledComponents";
 
 const Home: React.FC = () => {
   return (
@@ -251,56 +252,55 @@ const Home: React.FC = () => {
         <Box py={8}>
           <Box display='flex' flexDirection='row' justifyContent='space-between'>
             <Box>
-              <Typography component='a' href='/#' variant='h4' color='inherit' sx={{ textDecoration: "none" }}>
-                QuikNotes.
-              </Typography>
+              <StyledLink to='/#'>
+                <Typography variant='h4' display='inline-block'>
+                  QuikNotes.
+                </Typography>
+              </StyledLink>
+
               <Typography variant='body2' textAlign='center'>
                 access thoughts anywhere, anytime
               </Typography>
 
               <Box py={4} display='flex' flexDirection='row' alignItems='center' gap={2}>
-                <Typography
-                  component='a'
-                  href='https://www.linkedin.com/in/papusethi'
-                  title='Follow us on LinkedIn'
+                <StyledLink
+                  to='https://www.linkedin.com/in/papusethi'
                   target='_blank'
                   referrerPolicy='no-referrer'
-                  color='inherit'
+                  title='Follow on LinkedIn'
                   sx={{
                     transition: "all 0.3s ease",
                     "&:hover": { transform: "scale(1.2)" }
                   }}
                 >
                   <LinkedInIcon />
-                </Typography>
-                <Typography
-                  component='a'
-                  href='https://www.instagram.com/_papusethi_'
-                  title='Follow us on Instagram'
+                </StyledLink>
+
+                <StyledLink
+                  to='https://www.instagram.com/_papusethi_'
                   target='_blank'
                   referrerPolicy='no-referrer'
-                  color='inherit'
+                  title='Follow on Instagram'
                   sx={{
                     transition: "all 0.3s ease",
                     "&:hover": { transform: "scale(1.2)" }
                   }}
                 >
                   <InstagramIcon />
-                </Typography>
-                <Typography
-                  component='a'
-                  href='https://github.com/papusethi'
-                  title='Follow us on Github'
+                </StyledLink>
+
+                <StyledLink
+                  to='https://github.com/papusethi'
                   target='_blank'
                   referrerPolicy='no-referrer'
-                  color='inherit'
+                  title='Follow on GitHub'
                   sx={{
                     transition: "all 0.3s ease",
                     "&:hover": { transform: "scale(1.2)" }
                   }}
                 >
                   <GitHubIcon />
-                </Typography>
+                </StyledLink>
               </Box>
             </Box>
             <Box>
@@ -309,69 +309,33 @@ const Home: React.FC = () => {
               </Typography>
               <ul>
                 <li>
-                  <Typography
-                    component='a'
-                    href='#'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    QuikNote
-                  </Typography>
+                  <StyledLink to='/'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      QuikNote
+                    </Typography>
+                  </StyledLink>
                 </li>
                 <li>
-                  <Typography
-                    component='a'
-                    href='/quikdraw'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    QuikDraw
-                  </Typography>
+                  <StyledLink to='/quikdraw'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      Our team
+                    </Typography>
+                  </StyledLink>
                 </li>
 
                 <li>
-                  <Typography
-                    component='a'
-                    href='/quikdesgin'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    QuikDesign
-                  </Typography>
+                  <StyledLink to='/quikdesgin'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      QuikDesign
+                    </Typography>
+                  </StyledLink>
                 </li>
                 <li>
-                  <Typography
-                    component='a'
-                    href='/quikjam'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    QuikJam
-                  </Typography>
+                  <StyledLink to='/quikjam'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      QuikJam
+                    </Typography>
+                  </StyledLink>
                 </li>
               </ul>
             </Box>
@@ -381,73 +345,36 @@ const Home: React.FC = () => {
               </Typography>
               <ul>
                 <li>
-                  <Typography
-                    component='a'
-                    href='/about-us'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    About us
-                  </Typography>
+                  <StyledLink to='/about-us'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      About us
+                    </Typography>
+                  </StyledLink>
                 </li>
 
                 <li>
-                  <Typography
-                    component='a'
-                    href='/our-team'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    Our team
-                  </Typography>
+                  <StyledLink to='/our-team'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      Our team
+                    </Typography>
+                  </StyledLink>
                 </li>
                 <li>
-                  <Typography
-                    component='a'
-                    href='/collaboration'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    Colloaboration
-                  </Typography>
+                  <StyledLink to='/collaboration'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      Colloaboration
+                    </Typography>
+                  </StyledLink>
                 </li>
                 <li>
-                  <Typography
-                    component='a'
-                    href='/privacy-policy'
-                    variant='body2'
-                    color='inherit'
-                    sx={{
-                      textDecoration: "none",
-                      "&:hover": {
-                        textDecoration: "underline"
-                      }
-                    }}
-                  >
-                    Privacy policy
-                  </Typography>
+                  <StyledLink to='/privacy-policy'>
+                    <Typography variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                      Privacy policy
+                    </Typography>
+                  </StyledLink>
                 </li>
               </ul>
             </Box>
-            <Box></Box>
           </Box>
         </Box>
       </Container>
@@ -462,22 +389,11 @@ const Home: React.FC = () => {
 
             <Typography variant='body2'>
               Made with 💙 by{" "}
-              <Typography
-                variant='body2'
-                component='a'
-                href='https://papusethi.github.io/portfolio'
-                target='_blank'
-                referrerPolicy='no-referrer'
-                sx={{
-                  color: "inherit",
-                  textDecoration: "none",
-                  "&:hover": {
-                    textDecoration: "underline"
-                  }
-                }}
-              >
-                Papu Sethi
-              </Typography>
+              <StyledLink to='https://papusethi.github.io/portfolio' target='_blank' referrerPolicy='no-referrer'>
+                <Typography component='span' variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                  Papu Sethi
+                </Typography>
+              </StyledLink>
             </Typography>
           </Box>
         </Box>

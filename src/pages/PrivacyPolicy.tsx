@@ -1,27 +1,23 @@
 import { Box, Card, CardContent, Container, Typography } from "@mui/material";
 import React from "react";
+import { StyledLink } from "../components/styledComponents";
 
 const PrivacyPolicy: React.FC = () => {
   return (
     <Container maxWidth='lg'>
       <Box py={8}>
         <Container maxWidth='md'>
-          <Box>
-            <Typography
-              component='a'
-              href='/#'
-              variant='h4'
-              color='inherit'
-              textAlign='center'
-              display='block'
-              sx={{ textDecoration: "none" }}
-            >
-              QuikNotes
-            </Typography>
+          <Box textAlign='center'>
+            <StyledLink to='/#'>
+              <Typography variant='h4' display='inline-block'>
+                QuikNotes.
+              </Typography>
+            </StyledLink>
             <Typography variant='body2' textAlign='center'>
               please read our privacy policy carefully and understand
             </Typography>
           </Box>
+
           <Box my={4}>
             <Card variant='outlined'>
               <CardContent>

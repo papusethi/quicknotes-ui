@@ -22,6 +22,7 @@ import {
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../api/axiosInstance";
+import { StyledLink } from "../components/styledComponents";
 import { openSnackbarAlert, setTheme } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setCurrentUser } from "../redux/userSlice";
@@ -217,14 +218,21 @@ const Profile: React.FC = () => {
     <Container maxWidth='lg'>
       <Box py={2} display='flex' flexDirection='row' justifyContent='space-between' alignItems='center'>
         <Box>
-          <Typography component='a' href='/#' variant='h5' color='inherit' sx={{ textDecoration: "none" }}>
-            QuikNotes.
-          </Typography>
+          <StyledLink to='/#'>
+            <Typography variant='h5' display='inline-block'>
+              QuikNotes.
+            </Typography>
+          </StyledLink>
         </Box>
-        <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
-          <Avatar sx={{ width: 24, height: 24, background: theme.palette.primary.main }}>
-            {currentUser?.username?.[0]}
-          </Avatar>
+
+        <Box>
+          <StyledLink to='/profile'>
+            <Typography>
+              <Avatar sx={{ width: 24, height: 24, background: theme.palette.primary.main }}>
+                {currentUser?.username?.[0]}
+              </Avatar>
+            </Typography>
+          </StyledLink>
         </Box>
       </Box>
 

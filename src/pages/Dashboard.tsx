@@ -17,6 +17,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
 import NewNote from "../components/NewNote";
+import { StyledLink } from "../components/styledComponents";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setSavedNotes } from "../redux/userSlice";
@@ -80,16 +81,21 @@ const Dashboard: React.FC = () => {
     <Container maxWidth='lg'>
       <Box py={2} display='flex' flexDirection='row' justifyContent='space-between' alignItems='center'>
         <Box>
-          <Typography component='a' href='/#' variant='h5' color='inherit' sx={{ textDecoration: "none" }}>
-            QuikNotes.
-          </Typography>
+          <StyledLink to='/#'>
+            <Typography variant='h5' display='inline-block'>
+              QuikNotes.
+            </Typography>
+          </StyledLink>
         </Box>
-        <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
-          <Typography component='a' href='/profile'>
-            <Avatar sx={{ width: 24, height: 24, background: theme.palette.primary.main }}>
-              {currentUser?.username?.[0]}
-            </Avatar>
-          </Typography>
+
+        <Box>
+          <StyledLink to='/profile'>
+            <Typography>
+              <Avatar sx={{ width: 24, height: 24, background: theme.palette.primary.main }}>
+                {currentUser?.username?.[0]}
+              </Avatar>
+            </Typography>
+          </StyledLink>
         </Box>
       </Box>
 

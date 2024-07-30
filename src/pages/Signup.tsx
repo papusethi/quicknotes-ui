@@ -3,6 +3,7 @@ import { Box, Button, Card, CardContent, Container, TextField, Typography } from
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../api/axiosInstance";
+import { StyledLink } from "../components/styledComponents";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch } from "../redux/hooks";
 
@@ -41,22 +42,17 @@ const Signup: React.FC = () => {
     <Container maxWidth='lg'>
       <Box py={8}>
         <Container maxWidth='sm'>
-          <Box>
-            <Typography
-              component='a'
-              href='/#'
-              variant='h4'
-              color='inherit'
-              textAlign='center'
-              display='block'
-              sx={{ textDecoration: "none" }}
-            >
-              QuikNotes
-            </Typography>
+          <Box textAlign='center'>
+            <StyledLink to='/#'>
+              <Typography variant='h4' display='inline-block'>
+                QuikNotes.
+              </Typography>
+            </StyledLink>
             <Typography variant='body2' textAlign='center'>
               create your account to save your notes
             </Typography>
           </Box>
+
           <Box m={4}>
             <Card variant='outlined'>
               <CardContent>
@@ -113,35 +109,23 @@ const Signup: React.FC = () => {
           <Box textAlign='center'>
             <Typography variant='body2'>
               Geez, I've an account here,{" "}
-              <Typography
-                component='a'
-                href='/signin'
-                variant='body2'
-                color='primary'
-                sx={{
-                  textDecoration: "none",
-                  "&:hover": {
-                    textDecoration: "underline"
-                  }
-                }}
-              >
-                Sign in
+              <StyledLink to='/signin'>
+                <Typography
+                  component='span'
+                  variant='body2'
+                  color='primary'
+                  sx={{ "&:hover": { textDecoration: "underline" } }}
+                >
+                  Sign in
+                </Typography>
+              </StyledLink>
+            </Typography>
+
+            <StyledLink to='/privacy-policy'>
+              <Typography component='span' variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+                Privacy policy
               </Typography>
-            </Typography>
-            <Typography
-              component='a'
-              href='/privacy-policy'
-              variant='body2'
-              color='inherit'
-              sx={{
-                textDecoration: "none",
-                "&:hover": {
-                  textDecoration: "underline"
-                }
-              }}
-            >
-              Privacy policy
-            </Typography>
+            </StyledLink>
           </Box>
         </Container>
       </Box>
