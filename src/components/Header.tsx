@@ -1,10 +1,13 @@
-import { Box, Button, Typography } from "@mui/material";
+import { Avatar, Box, Button, Typography, useTheme } from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "../redux/hooks";
 import { StyledLink } from "./styledComponents";
 
 const Header: React.FC = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
+  const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const handleClickSignin = () => {
     navigate("/signin");
@@ -54,14 +57,27 @@ const Header: React.FC = () => {
           </li>
         </ul>
       </Box>
-      <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
-        <Button size='small' onClick={handleClickSignin}>
-          Sign in
-        </Button>
-        <Button size='small' variant='contained' disableElevation onClick={handleClickCreateAccount}>
-          Create an account
-        </Button>
-      </Box>
+
+      {currentUser ? (
+        <Box>
+          <StyledLink to='/profile'>
+            <Typography>
+              <Avatar sx={{ width: 24, height: 24, background: theme.palette.primary.main }}>
+                {currentUser?.username?.[0]}
+              </Avatar>
+            </Typography>
+          </StyledLink>
+        </Box>
+      ) : (
+        <Box display='flex' flexDirection='row' justifyContent='space-between' alignItems='center' gap={1}>
+          <Button size='small' onClick={handleClickSignin}>
+            Sign in
+          </Button>
+          <Button size='small' variant='contained' disableElevation onClick={handleClickCreateAccount}>
+            Create an account
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };

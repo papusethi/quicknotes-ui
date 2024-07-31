@@ -1,6 +1,7 @@
-import { Box, Card, CardContent, Container, Typography } from "@mui/material";
+import { Box, Button, Card, CardContent, Container, Typography } from "@mui/material";
 import React from "react";
 import { StyledLink } from "../components/styledComponents";
+import { ArrowBackOutlined } from "@mui/icons-material";
 
 const PageNotFound: React.FC = () => {
   return (
@@ -34,6 +35,15 @@ const PageNotFound: React.FC = () => {
                   <Typography variant='body2' textAlign='center'>
                     help us find something to put here
                   </Typography>
+                </Box>
+
+                <Box textAlign='center'>
+                  <StyledLink to='/#'>
+                    <Button size='small' variant='text' disableElevation>
+                      <ArrowBackOutlined fontSize='small' sx={{ mr: 1 }} />
+                      Go back to home
+                    </Button>
+                  </StyledLink>
                 </Box>
               </CardContent>
             </Card>

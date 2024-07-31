@@ -35,9 +35,11 @@ const Home: React.FC = () => {
               <PlayCircleOutlinedIcon fontSize='small' sx={{ marginRight: 1 }} />
               Get demo
             </Button>
-            <Button variant='contained' size='small' disableElevation>
-              Create a note
-            </Button>
+            <StyledLink to='/dashboard'>
+              <Button variant='contained' size='small' disableElevation>
+                Create a note
+              </Button>
+            </StyledLink>
           </Box>
         </Box>
       </Container>
@@ -59,8 +61,8 @@ const Home: React.FC = () => {
                   QuikDraw
                 </Typography>
                 <Typography variant='body2' my={2}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut neque nostrum amet voluptatum,
-                  necessitatibus error.
+                  QuikDraw is your pocket-sized digital freeform board to instantly sketch your ideas and thoughts in
+                  the cloud.
                 </Typography>
 
                 <Button size='small'>
@@ -77,8 +79,8 @@ const Home: React.FC = () => {
                   QuikDesign
                 </Typography>
                 <Typography variant='body2' my={2}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut neque nostrum amet voluptatum,
-                  necessitatibus error.
+                  QuikDraw is an industry grade design tool to plot your imagination into design in a collaborative way
+                  in the cloud.
                 </Typography>
                 <Button size='small'>
                   Try it
@@ -94,8 +96,8 @@ const Home: React.FC = () => {
                   QuikJam
                 </Typography>
                 <Typography variant='body2' my={2}>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Ut neque nostrum amet voluptatum,
-                  necessitatibus error.
+                  QuikJam is a light-weight application to plot business model and software architectural diagrams in a
+                  collaborative way in the cloud.
                 </Typography>
 
                 <Button size='small'>
@@ -214,14 +216,6 @@ const Home: React.FC = () => {
                         </Typography>
                         <Typography component='span' variant='body2'>
                           Set reminders for specific notes
-                        </Typography>
-                      </li>
-                      <li>
-                        <Typography component='span' variant='body2' fontWeight={600}>
-                          Offline Access:
-                        </Typography>
-                        <Typography component='span' variant='body2'>
-                          Access notes without an internet connection
                         </Typography>
                       </li>
                       <li>

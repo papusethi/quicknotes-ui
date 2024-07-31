@@ -69,8 +69,9 @@ const Profile: React.FC = () => {
   const handleClickSignout = async () => {
     try {
       const { data } = await axiosInstance.get("/auth/signout");
-      navigate("/signin");
+      dispatch(setCurrentUser(null));
       dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
+      navigate("/signin");
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
