@@ -1,3 +1,4 @@
+import { Check } from "@mui/icons-material";
 import AddOutlined from "@mui/icons-material/AddOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import {
@@ -9,7 +10,8 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
-  TextField
+  TextField,
+  useTheme
 } from "@mui/material";
 import React, { useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
@@ -22,11 +24,12 @@ interface INewNoteProps {
   onClose: () => void;
 }
 
-type INewNoteData = Pick<INote, "title" | "description" | "isPinned" | "tags">;
+type INewNoteData = Pick<INote, "title" | "description" | "isPinned" | "tags" | "color">;
 
 const NewNote: React.FC<INewNoteProps> = (props) => {
   const { onClose } = props;
 
+  const theme = useTheme();
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
@@ -47,6 +50,11 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
 
   const handleClickNewNotePinned = () => {
     const updatedData = { ...newNoteData, isPinned: !newNoteData.isPinned };
+    setNewNoteData(updatedData);
+  };
+
+  const handleClickNoteColor = (colorValue: string) => {
+    const updatedData = { ...newNoteData, color: newNoteData.color === colorValue ? "" : colorValue };
     setNewNoteData(updatedData);
   };
 
@@ -84,23 +92,46 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
     }
   };
 
+  const availableColors = ["primary", "secondary", "warning"] as const;
+
   return (
     <Dialog open={true} maxWidth='sm' fullWidth onClose={onClose}>
       <DialogTitle>{newNoteData.title || "Untitled note"}</DialogTitle>
       <DialogContent>
-        <Chip
-          size='small'
-          icon={
-            <PushPinOutlinedIcon
-              fontSize='small'
-              color={newNoteData.isPinned ? "warning" : "inherit"}
-              sx={{ mr: 0.5, transform: newNoteData.isPinned ? "rotate(45deg)" : "rotate(0deg)" }}
-            />
-          }
-          label={newNoteData.isPinned ? "Pinned" : "Unpinned"}
-          clickable
-          onClick={handleClickNewNotePinned}
-        />
+        <Box display='flex' alignItems='center' gap={0.5}>
+          <Chip
+            size='small'
+            icon={
+              <PushPinOutlinedIcon
+                fontSize='small'
+                color={newNoteData.isPinned ? "warning" : "inherit"}
+                sx={{ mr: 0.5, transform: newNoteData.isPinned ? "rotate(45deg)" : "rotate(0deg)" }}
+              />
+            }
+            label={newNoteData.isPinned ? "Pinned" : "Unpinned"}
+            clickable
+            onClick={handleClickNewNotePinned}
+          />
+
+          {availableColors.map((colorKey) => {
+            const colorValue = `${theme.palette[colorKey].light}33`;
+            return (
+              <Box
+                key={colorKey}
+                display='flex'
+                alignItems='center'
+                justifyContent='center'
+                width={24}
+                height={24}
+                borderRadius='50%'
+                bgcolor={colorValue}
+                onClick={() => handleClickNoteColor(colorValue)}
+              >
+                {newNoteData.color === colorValue && <Check fontSize='small' />}
+              </Box>
+            );
+          })}
+        </Box>
 
         <Box mt={1.5} display='flex' flexDirection='column' gap={1.5}>
           <TextField

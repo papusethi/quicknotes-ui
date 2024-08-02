@@ -28,6 +28,7 @@ export interface INote {
   description: string;
   tags: string[];
   isPinned: boolean;
+  color?: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -41,8 +42,12 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     const fetchAllNotes = async () => {
-      const { data } = await axiosInstance.get("/note");
-      dispatch(setSavedNotes(data?.data));
+      try {
+        const { data } = await axiosInstance.get("/note");
+        dispatch(setSavedNotes(data?.data));
+      } catch (error) {
+        console.error(error);
+      }
     };
 
     fetchAllNotes();
@@ -118,10 +123,14 @@ const Dashboard: React.FC = () => {
         {Array.isArray(savedNotes) && savedNotes.length > 0 ? (
           <Box mt={2} display='grid' gap={1} gridTemplateColumns={"repeat(3, 1fr)"}>
             {savedNotes?.map((note) => {
-              const { _id, title, description, tags, isPinned } = note;
+              const { _id, title, description, tags, isPinned, color } = note;
 
               return (
-                <Card key={_id} variant='outlined'>
+                <Card
+                  key={_id}
+                  variant='outlined'
+                  sx={{ bgcolor: color, "&:hover": { boxShadow: (theme) => theme.shadows[4] } }}
+                >
                   <CardContent>
                     <Box display='flex' flexDirection='row' justifyContent='space-between' gap={1}>
                       <Typography variant='h6'>{title}</Typography>
