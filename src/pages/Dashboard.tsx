@@ -1,6 +1,8 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
+import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import {
   Avatar,
   Box,
@@ -11,6 +13,7 @@ import {
   Container,
   Divider,
   IconButton,
+  Tooltip,
   Typography,
   useTheme
 } from "@mui/material";
@@ -135,28 +138,45 @@ const Dashboard: React.FC = () => {
                     <Box display='flex' flexDirection='row' justifyContent='space-between' gap={1}>
                       <Typography variant='h6'>{title}</Typography>
                       <Box>
-                        <IconButton size='small' onClick={() => handleClickPinNote(note)}>
-                          <PushPinOutlinedIcon
-                            fontSize='small'
-                            color={isPinned ? "primary" : "inherit"}
-                            sx={{ transform: isPinned ? "rotate(45deg)" : "rotate(0deg)" }}
-                          />
-                        </IconButton>
-                        <IconButton size='small' onClick={() => handleClickDeleteNote(_id)}>
-                          <DeleteForeverOutlinedIcon fontSize='small' color='error' />
-                        </IconButton>
+                        <Tooltip title={isPinned ? "Unpin note" : "Pin note"}>
+                          <IconButton size='small' onClick={() => handleClickPinNote(note)}>
+                            <PushPinOutlinedIcon
+                              fontSize='small'
+                              color={isPinned ? "primary" : "inherit"}
+                              sx={{ transform: isPinned ? "rotate(45deg)" : "rotate(0deg)" }}
+                            />
+                          </IconButton>
+                        </Tooltip>
                       </Box>
                     </Box>
 
-                    <Typography variant='body2' my={1}>
+                    <Typography variant='body2' mt={1}>
                       {description}
                     </Typography>
 
-                    <Box display='flex' flexDirection='row' flexWrap='wrap' gap={1}>
+                    <Box display='flex' flexDirection='row' flexWrap='wrap' gap={1} mt={1}>
                       {tags?.map((tag) => (
                         <Chip key={tag} label={tag} size='small' color='default' variant='outlined' />
                       ))}
                     </Box>
+
+                    <Box mt={1}>
+                      <Tooltip title='Delete note'>
+                        <IconButton size='small' onClick={() => handleClickDeleteNote(_id)}>
+                          <DeleteForeverOutlinedIcon fontSize='small' color='error' />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title='Remind me'>
+                        <IconButton size='small'>
+                          <AddAlertOutlinedIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                      <Tooltip title='Background options'>
+                        <IconButton size='small'>
+                          <ColorLensOutlinedIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>  
                   </CardContent>
                 </Card>
               );
