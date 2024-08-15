@@ -24,7 +24,7 @@ interface INewNoteProps {
   onClose: () => void;
 }
 
-type INewNoteData = Pick<INote, "title" | "description" | "isPinned" | "tags" | "color">;
+type INewNoteData = Omit<INote, "_id">;
 
 const NewNote: React.FC<INewNoteProps> = (props) => {
   const { onClose } = props;
@@ -38,7 +38,8 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
     title: "",
     description: "",
     tags: [],
-    isPinned: false
+    isPinned: false,
+    isArchived: false
   });
   const [tagInput, setTagInput] = useState("");
 
@@ -59,7 +60,7 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
   };
 
   const handleChangeTagInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTagInput(event?.target?.value);
+    setTagInput(event.target.value);
   };
 
   const handleClickAddTag = () => {

@@ -1,8 +1,10 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import PushPinIcon from "@mui/icons-material/PushPin";
+import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import {
   Avatar,
   Box,
@@ -31,6 +33,7 @@ export interface INote {
   description: string;
   tags: string[];
   isPinned: boolean;
+  isArchived: boolean;
   color?: string;
 }
 
@@ -64,22 +67,58 @@ const Dashboard: React.FC = () => {
     setIsOpenNoteDialog(false);
   };
 
-  const handleClickDeleteNote = async (noteId: string) => {
+  const handleClickDeleteNote = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+
     try {
-      const { data } = await axiosInstance.delete(`/note/${noteId}`);
+      const { data } = await axiosInstance.delete(`/note/${note._id}`);
       dispatch(setSavedNotes(data?.data));
-      dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
   };
 
-  const handleClickPinNote = async (note: INote) => {
+  const handleClickPinNote = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+
     const updateNote = { ...note, isPinned: !note.isPinned };
     try {
       const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
       dispatch(setSavedNotes(data?.data));
-      dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
+  const handleClickRemoveTag = async (event: any, note: INote, tag: string) => {
+    event?.stopPropagation();
+
+    const updatedTags = note.tags.filter((currentTag) => currentTag !== tag);
+    const updateNote = { ...note, tags: updatedTags };
+    try {
+      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      dispatch(setSavedNotes(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
+  const handleClickRemindMe = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    console.log("remind me clicked");
+  };
+
+  const handleClickBgOptions = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    console.log("bg options clicked");
+  };
+
+  const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    const updateNote = { ...note, isArchived: !note.isArchived };
+    try {
+      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      dispatch(setSavedNotes(data?.data));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
@@ -112,7 +151,7 @@ const Dashboard: React.FC = () => {
       <Box my={2}>
         <Box display='flex' flexDirection='row' justifyContent='space-between' gap={1}>
           <Box>
-            <Typography variant='h6'>All your notes</Typography>
+            <Typography variant='h6'>All your notes ({savedNotes.length})</Typography>
           </Box>
 
           <Box>
@@ -124,7 +163,7 @@ const Dashboard: React.FC = () => {
         </Box>
 
         {Array.isArray(savedNotes) && savedNotes.length > 0 ? (
-          <Box mt={2} display='grid' gap={1} gridTemplateColumns={"repeat(3, 1fr)"}>
+          <Box my={2} display='grid' gap={1} gridTemplateColumns={"repeat(3, 1fr)"}>
             {savedNotes?.map((note) => {
               const { _id, title, description, tags, isPinned, color } = note;
 
@@ -133,18 +172,19 @@ const Dashboard: React.FC = () => {
                   key={_id}
                   variant='outlined'
                   sx={{ bgcolor: color, "&:hover": { boxShadow: (theme) => theme.shadows[4] } }}
+                  onClick={() => console.log("clicked on card")}
                 >
                   <CardContent>
                     <Box display='flex' flexDirection='row' justifyContent='space-between' gap={1}>
                       <Typography variant='h6'>{title}</Typography>
                       <Box>
                         <Tooltip title={isPinned ? "Unpin note" : "Pin note"}>
-                          <IconButton size='small' onClick={() => handleClickPinNote(note)}>
-                            <PushPinOutlinedIcon
-                              fontSize='small'
-                              color={isPinned ? "primary" : "inherit"}
-                              sx={{ transform: isPinned ? "rotate(45deg)" : "rotate(0deg)" }}
-                            />
+                          <IconButton size='small' onClick={(event) => handleClickPinNote(event, note)}>
+                            {isPinned ? (
+                              <PushPinOutlinedIcon fontSize='small' />
+                            ) : (
+                              <PushPinIcon fontSize='small' color='primary' sx={{ transform: "rotate(45deg)" }} />
+                            )}
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -156,61 +196,71 @@ const Dashboard: React.FC = () => {
 
                     <Box display='flex' flexDirection='row' flexWrap='wrap' gap={1} mt={1}>
                       {tags?.map((tag) => (
-                        <Chip key={tag} label={tag} size='small' color='default' variant='outlined' />
+                        <Chip
+                          key={tag}
+                          label={tag}
+                          size='small'
+                          color='default'
+                          variant='outlined'
+                          onDelete={(event) => handleClickRemoveTag(event, note, tag)}
+                        />
                       ))}
                     </Box>
 
                     <Box mt={1}>
                       <Tooltip title='Delete note'>
-                        <IconButton size='small' onClick={() => handleClickDeleteNote(_id)}>
+                        <IconButton size='small' onClick={(event) => handleClickDeleteNote(event, note)}>
                           <DeleteForeverOutlinedIcon fontSize='small' color='error' />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title='Remind me'>
-                        <IconButton size='small'>
+                        <IconButton size='small' onClick={(event) => handleClickRemindMe(event, note)}>
                           <AddAlertOutlinedIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
                       <Tooltip title='Background options'>
-                        <IconButton size='small'>
+                        <IconButton size='small' onClick={(event) => handleClickBgOptions(event, note)}>
                           <ColorLensOutlinedIcon fontSize='small' />
                         </IconButton>
                       </Tooltip>
-                    </Box>  
+                      <Tooltip title='Archive'>
+                        <IconButton size='small' onClick={(event) => handleClickArchive(event, note)}>
+                          <ArchiveOutlinedIcon fontSize='small' />
+                        </IconButton>
+                      </Tooltip>
+                    </Box>
                   </CardContent>
                 </Card>
               );
             })}
           </Box>
         ) : (
-          <Box my={4}>
-            <Container maxWidth='md'>
-              <Card variant='outlined'>
-                <CardContent>
-                  <Box
-                    minHeight={300}
-                    display='flex'
-                    flexDirection='column'
-                    alignItems='center'
-                    justifyContent='center'
-                    textAlign='center'
-                  >
-                    <Typography variant='h6' textAlign='center'>
-                      Nothing to see yet, why not start a new note?
-                    </Typography>
-                    <Typography variant='body2' textAlign='center'>
-                      It's time to save some ideas and thoughts of yours
-                    </Typography>
+          <Box my={2}>
+            <Card variant='outlined'>
+              <CardContent>
+                <Box
+                  minHeight={300}
+                  display='flex'
+                  flexDirection='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  textAlign='center'
+                >
+                  <Typography variant='h6' textAlign='center'>
+                    Nothing to see yet, why not start a new note?
+                  </Typography>
+                  <Typography variant='body2' textAlign='center'>
+                    It's time to save some ideas and thoughts of yours
+                  </Typography>
 
-                    <Box mt={2}>
-                      <Button size='small' variant='contained' disableElevation onClick={handleOpenNewNote}>
-                        Write your first note
-                      </Button>
-                    </Box>
+                  <Box mt={2}>
+                    <Button size='small' variant='contained' disableElevation onClick={handleOpenNewNote}>
+                      Write your first note
+                    </Button>
                   </Box>
-                </CardContent>
-              </Card>
-            </Container>
+                </Box>
+              </CardContent>
+            </Card>
           </Box>
         )}
 

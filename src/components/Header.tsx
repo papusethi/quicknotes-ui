@@ -24,6 +24,7 @@ const Header: React.FC = () => {
           <Typography variant='h5'>QuikNotes.</Typography>
         </StyledLink>
       </Box>
+
       <Box>
         <ul
           style={{
