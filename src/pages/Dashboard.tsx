@@ -1,4 +1,3 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import EditIcon from "@mui/icons-material/Edit";
@@ -7,46 +6,35 @@ import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography
-} from "@mui/material";
+import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
+import CreateNote from "../components/create-note/CreateNote";
+import EditNote from "../components/edit-note/EditNote";
 import Header from "../components/header/Header";
-import NewNote from "../components/NewNote";
-import NoteItem from "../components/noteItem/NoteItem";
+import NoteList from "../components/note-list/NoteList";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setUserNotes } from "../redux/userSlice";
 
 export interface INote {
-  _id: string;
+  readonly _id?: string;
   title: string;
   description: string;
   tags: string[];
   isPinned: boolean;
   isArchived: boolean;
-  color?: string;
+  color: null | string;
 }
 
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const userNotes = useAppSelector((state) => state.user.userNotes);
-  const userPreferences = useAppSelector((state) => state.user.userPreferences);
 
   const [selectedId, setSelectedId] = useState("notes");
-  const [isOpenNoteDialog, setIsOpenNoteDialog] = useState(false);
+  const [openEditNote, setOpenEditNote] = useState(false);
+  const [currentNote, setCurrentNote] = useState<null | INote>(null);
 
   useEffect(() => {
     const fetchAllNotes = async () => {
@@ -65,12 +53,9 @@ const Dashboard: React.FC = () => {
     setSelectedId(newTabId);
   };
 
-  const handleOpenNewNote = () => {
-    setIsOpenNoteDialog(true);
-  };
-
-  const handleCloseNewNote = () => {
-    setIsOpenNoteDialog(false);
+  const handleClickClose = () => {
+    setOpenEditNote(false);
+    setCurrentNote(null);
   };
 
   const handleClickDeleteNote = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
@@ -130,6 +115,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleClickCard = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    setOpenEditNote(true);
+    setCurrentNote(note);
+  };
+
   const unarchivedNotes: INote[] = [];
   const archivedNotes: INote[] = [];
 
@@ -149,73 +139,21 @@ const Dashboard: React.FC = () => {
       ActiveIcon: LightbulbIcon,
       content: (
         <Box>
-          <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1}>
-            <Box>
-              <Typography variant="h6">Notes ({unarchivedNotes.length})</Typography>
-            </Box>
-
-            <Box>
-              <Button size="small" variant="contained" disableElevation onClick={handleOpenNewNote}>
-                <AddOutlinedIcon fontSize="small" sx={{ mr: 0.5 }} />
-                New note
-              </Button>
-            </Box>
-          </Box>
-
-          {Array.isArray(unarchivedNotes) && unarchivedNotes.length > 0 ? (
-            <Box
-              my={2}
-              display="grid"
-              gap={1}
-              gridTemplateColumns={userPreferences?.viewType === "list" ? "repeat(1, 1fr)" : "repeat(3, 1fr)"}
-            >
-              {unarchivedNotes?.map((note) => {
-                return (
-                  <NoteItem
-                    key={note._id}
-                    note={note}
-                    onClickPinNote={handleClickPinNote}
-                    onClickDeleteNote={handleClickDeleteNote}
-                    onClickRemindMe={handleClickRemindMe}
-                    onClickBgOptions={handleClickBgOptions}
-                    onClickArchive={handleClickArchive}
-                    onClickRemoveTag={handleClickRemoveTag}
-                  />
-                );
-              })}
-            </Box>
-          ) : (
-            <Box my={2}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Box
-                    minHeight={300}
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    textAlign="center"
-                  >
-                    <LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />
-                    <Typography variant="h6" textAlign="center">
-                      Nothing to see yet, why not start a new note?
-                    </Typography>
-                    <Typography variant="body2" textAlign="center">
-                      It's time to save some ideas and thoughts of yours
-                    </Typography>
-
-                    <Box mt={2}>
-                      <Button size="small" variant="contained" disableElevation onClick={handleOpenNewNote}>
-                        Write your first note
-                      </Button>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
-          )}
-
-          {isOpenNoteDialog && <NewNote onClose={handleCloseNewNote} />}
+          <NoteList
+            notes={unarchivedNotes}
+            emptyState={{
+              Icon: <LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+              title: "Nothing to see yet, why not start a new note?",
+              subtitle: "It's time to save some ideas and thoughts of yours"
+            }}
+            onClickPinNote={handleClickPinNote}
+            onClickDeleteNote={handleClickDeleteNote}
+            onClickRemindMe={handleClickRemindMe}
+            onClickBgOptions={handleClickBgOptions}
+            onClickArchive={handleClickArchive}
+            onClickRemoveTag={handleClickRemoveTag}
+            onClickCard={handleClickCard}
+          />
         </Box>
       )
     },
@@ -240,64 +178,20 @@ const Dashboard: React.FC = () => {
       ActiveIcon: ArchiveIcon,
       content: (
         <Box>
-          <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1}>
-            <Box>
-              <Typography variant="h6">Archived ({archivedNotes.length})</Typography>
-            </Box>
-
-            <Box>
-              <Button size="small" variant="contained" disableElevation onClick={handleOpenNewNote}>
-                <AddOutlinedIcon fontSize="small" sx={{ mr: 0.5 }} />
-                New note
-              </Button>
-            </Box>
-          </Box>
-
-          {Array.isArray(archivedNotes) && archivedNotes.length > 0 ? (
-            <Box
-              my={2}
-              display="grid"
-              gap={1}
-              gridTemplateColumns={userPreferences?.viewType === "list" ? "repeat(1, 1fr)" : "repeat(3, 1fr)"}
-            >
-              {archivedNotes?.map((note) => {
-                return (
-                  <NoteItem
-                    key={note._id}
-                    note={note}
-                    onClickPinNote={handleClickPinNote}
-                    onClickDeleteNote={handleClickDeleteNote}
-                    onClickRemindMe={handleClickRemindMe}
-                    onClickBgOptions={handleClickBgOptions}
-                    onClickArchive={handleClickArchive}
-                    onClickRemoveTag={handleClickRemoveTag}
-                  />
-                );
-              })}
-            </Box>
-          ) : (
-            <Box my={2}>
-              <Card variant="outlined">
-                <CardContent>
-                  <Box
-                    minHeight={300}
-                    display="flex"
-                    flexDirection="column"
-                    alignItems="center"
-                    justifyContent="center"
-                    textAlign="center"
-                  >
-                    <ArchiveOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />
-                    <Typography variant="h6" textAlign="center">
-                      Your archived notes appear here
-                    </Typography>
-                  </Box>
-                </CardContent>
-              </Card>
-            </Box>
-          )}
-
-          {isOpenNoteDialog && <NewNote onClose={handleCloseNewNote} />}
+          <NoteList
+            notes={archivedNotes}
+            emptyState={{
+              Icon: <ArchiveOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+              title: "Your archived notes appear here"
+            }}
+            onClickPinNote={handleClickPinNote}
+            onClickDeleteNote={handleClickDeleteNote}
+            onClickRemindMe={handleClickRemindMe}
+            onClickBgOptions={handleClickBgOptions}
+            onClickArchive={handleClickArchive}
+            onClickRemoveTag={handleClickRemoveTag}
+            onClickCard={handleClickCard}
+          />
         </Box>
       )
     }
@@ -330,7 +224,13 @@ const Dashboard: React.FC = () => {
         </Box>
 
         <Box flex={4}>
-          <Box p={2}>{listConfig?.find((item) => item.id === selectedId)?.content ?? null}</Box>
+          <Box p={2}>
+            <CreateNote />
+
+            {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
+          </Box>
+
+          <EditNote open={openEditNote} note={currentNote} onClose={handleClickClose} />
         </Box>
       </Box>
     </Box>

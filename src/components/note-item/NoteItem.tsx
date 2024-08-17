@@ -5,9 +5,10 @@ import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
-import { Box, Card, CardContent, Chip, IconButton, Tooltip, Typography } from "@mui/material";
+import { Box, Card, CardActions, CardContent, Chip, IconButton, Tooltip, Typography } from "@mui/material";
 import React, { Fragment } from "react";
 import { INote } from "../../pages/Dashboard";
+import { AVAILABLE_COLORS, IAvailableColors } from "../color";
 
 interface INoteItem {
   note: INote;
@@ -17,6 +18,7 @@ interface INoteItem {
   onClickRemindMe: Function;
   onClickBgOptions: Function;
   onClickArchive: Function;
+  onClickCard: Function;
 }
 
 const NoteItem: React.FC<INoteItem> = (props) => {
@@ -27,7 +29,8 @@ const NoteItem: React.FC<INoteItem> = (props) => {
     onClickDeleteNote,
     onClickRemindMe,
     onClickBgOptions,
-    onClickArchive
+    onClickArchive,
+    onClickCard
   } = props;
 
   const { title, description, tags, isPinned, isArchived, color } = note;
@@ -46,8 +49,11 @@ const NoteItem: React.FC<INoteItem> = (props) => {
   return (
     <Card
       variant="outlined"
-      sx={{ bgcolor: color, "&:hover": { boxShadow: (theme) => theme.shadows[4] } }}
-      onClick={() => console.log("clicked on card")}
+      sx={{
+        bgcolor: color ? AVAILABLE_COLORS[color as IAvailableColors] : "inherit",
+        "&:hover": { boxShadow: (theme) => theme.shadows[4] }
+      }}
+      onClick={(event) => onClickCard(event, note)}
     >
       <CardContent>
         <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1}>
@@ -65,7 +71,7 @@ const NoteItem: React.FC<INoteItem> = (props) => {
           </Box>
         </Box>
 
-        <Typography variant="body2" mt={1}>
+        <Typography whiteSpace="pre-wrap" variant="body2" mt={1}>
           {description}
         </Typography>
 
@@ -81,19 +87,19 @@ const NoteItem: React.FC<INoteItem> = (props) => {
             />
           ))}
         </Box>
-
-        <Box mt={1}>
-          {actionButtons.map(({ title, Icon, onClick }) => (
-            <Fragment key={title}>
-              <Tooltip title={title}>
-                <IconButton size="small" onClick={(event) => onClick(event, note)}>
-                  {Icon}
-                </IconButton>
-              </Tooltip>
-            </Fragment>
-          ))}
-        </Box>
       </CardContent>
+
+      <CardActions>
+        {actionButtons.map(({ title, Icon, onClick }) => (
+          <Fragment key={title}>
+            <Tooltip title={title}>
+              <IconButton size="small" onClick={(event) => onClick(event, note)}>
+                {Icon}
+              </IconButton>
+            </Tooltip>
+          </Fragment>
+        ))}
+      </CardActions>
     </Card>
   );
 };
