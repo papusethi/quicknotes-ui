@@ -4,7 +4,7 @@ import { useAppSelector } from "../redux/hooks";
 
 const PrivateRoutes: React.FC = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  return currentUser ? <Outlet /> : <Navigate to='/signin' />;
+  return currentUser ? <Outlet /> : <Navigate to="/signin" />;
 };
 
 export default PrivateRoutes;

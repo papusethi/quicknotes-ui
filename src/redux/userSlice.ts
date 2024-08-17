@@ -3,12 +3,14 @@ import { INote } from "../pages/Dashboard";
 
 export interface UserState {
   currentUser: null | Record<string, string>;
-  savedNotes: INote[];
+  userPreferences: null | Record<string, string>;
+  userNotes: INote[];
 }
 
 const initialState: UserState = {
   currentUser: null,
-  savedNotes: []
+  userPreferences: null,
+  userNotes: []
 };
 
 export const userSlice = createSlice({
@@ -19,12 +21,15 @@ export const userSlice = createSlice({
     setCurrentUser: (state, action) => {
       state.currentUser = action.payload;
     },
-    setSavedNotes: (state, action) => {
-      state.savedNotes = action.payload || [];
+    setUserPreferences: (state, action) => {
+      state.userPreferences = action.payload;
+    },
+    setUserNotes: (state, action) => {
+      state.userNotes = action.payload || [];
     }
   }
 });
 
-export const { setCurrentUser, setSavedNotes } = userSlice.actions;
+export const { setCurrentUser, setUserPreferences, setUserNotes } = userSlice.actions;
 
 export default userSlice.reducer;

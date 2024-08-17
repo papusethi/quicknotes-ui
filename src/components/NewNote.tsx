@@ -1,5 +1,6 @@
 import { Check } from "@mui/icons-material";
 import AddOutlined from "@mui/icons-material/AddOutlined";
+import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import {
   Box,
@@ -18,7 +19,7 @@ import { axiosInstance } from "../api/axiosInstance";
 import { INote } from "../pages/Dashboard";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setSavedNotes } from "../redux/userSlice";
+import { setUserNotes } from "../redux/userSlice";
 
 interface INewNoteProps {
   onClose: () => void;
@@ -82,7 +83,7 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
       const newNote = { ...newNoteData, userId: currentUser?._id };
       try {
         const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
-        dispatch(setSavedNotes(data?.data));
+        dispatch(setUserNotes(data?.data));
         dispatch(openSnackbarAlert({ severity: "success", message: data?.message }));
         onClose();
       } catch (error: any) {
@@ -96,21 +97,21 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
   const availableColors = ["primary", "secondary", "warning"] as const;
 
   return (
-    <Dialog open={true} maxWidth='sm' fullWidth onClose={onClose}>
+    <Dialog open={true} maxWidth="sm" fullWidth onClose={onClose}>
       <DialogTitle>{newNoteData.title || "Untitled note"}</DialogTitle>
       <DialogContent>
-        <Box display='flex' alignItems='center' gap={0.5}>
+        <Box display="flex" alignItems="center" gap={0.5}>
           <Chip
-            size='small'
-            icon={
-              <PushPinOutlinedIcon
-                fontSize='small'
-                color={newNoteData.isPinned ? "warning" : "inherit"}
-                sx={{ mr: 0.5, transform: newNoteData.isPinned ? "rotate(45deg)" : "rotate(0deg)" }}
-              />
-            }
-            label={newNoteData.isPinned ? "Pinned" : "Unpinned"}
+            size="small"
             clickable
+            label={newNoteData.isPinned ? "Pinned" : "Unpinned"}
+            icon={
+              newNoteData.isPinned ? (
+                <PushPinIcon fontSize="small" color="primary" sx={{ mr: 0.5, transform: "rotate(45deg)" }} />
+              ) : (
+                <PushPinOutlinedIcon fontSize="small" sx={{ mr: 0.5 }} />
+              )
+            }
             onClick={handleClickNewNotePinned}
           />
 
@@ -119,28 +120,28 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
             return (
               <Box
                 key={colorKey}
-                display='flex'
-                alignItems='center'
-                justifyContent='center'
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
                 width={24}
                 height={24}
-                borderRadius='50%'
+                borderRadius="50%"
                 bgcolor={colorValue}
                 onClick={() => handleClickNoteColor(colorValue)}
               >
-                {newNoteData.color === colorValue && <Check fontSize='small' />}
+                {newNoteData.color === colorValue && <Check fontSize="small" />}
               </Box>
             );
           })}
         </Box>
 
-        <Box mt={1.5} display='flex' flexDirection='column' gap={1.5}>
+        <Box mt={1.5} display="flex" flexDirection="column" gap={1.5}>
           <TextField
             fullWidth
-            name='title'
-            label='Title'
-            variant='standard'
-            size='small'
+            name="title"
+            label="Title"
+            variant="standard"
+            size="small"
             required
             value={newNoteData.title}
             onChange={handleChangeNewNoteFields}
@@ -149,39 +150,39 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
           <TextField
             fullWidth
             multiline
-            name='description'
-            label='Description'
-            variant='standard'
-            size='small'
+            name="description"
+            label="Description"
+            variant="standard"
+            size="small"
             value={newNoteData.description}
             onChange={handleChangeNewNoteFields}
           />
 
           <TextField
             fullWidth
-            name='tag'
-            label='Tag'
-            variant='standard'
-            size='small'
+            name="tag"
+            label="Tag"
+            variant="standard"
+            size="small"
             value={tagInput}
             onChange={handleChangeTagInput}
             InputProps={{
               endAdornment: (
-                <IconButton size='small' onClick={handleClickAddTag}>
-                  <AddOutlined fontSize='small' color='primary' />
+                <IconButton size="small" onClick={handleClickAddTag}>
+                  <AddOutlined fontSize="small" color="primary" />
                 </IconButton>
               )
             }}
           />
 
-          <Box display='flex' flexDirection='row' flexWrap='wrap' gap={1}>
+          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
             {newNoteData?.tags?.map((tag) => (
               <Chip
                 key={tag}
                 label={tag}
-                size='small'
-                color='default'
-                variant='outlined'
+                size="small"
+                color="default"
+                variant="outlined"
                 onDelete={() => handleClickDeleteTag(tag)}
               />
             ))}
@@ -189,10 +190,10 @@ const NewNote: React.FC<INewNoteProps> = (props) => {
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button size='small' variant='outlined' disableElevation onClick={onClose}>
+        <Button size="small" variant="outlined" disableElevation onClick={onClose}>
           Close
         </Button>
-        <Button size='small' variant='contained' disableElevation onClick={handleClickSaveNewNote}>
+        <Button size="small" variant="contained" disableElevation onClick={handleClickSaveNewNote}>
           Save
         </Button>
       </DialogActions>

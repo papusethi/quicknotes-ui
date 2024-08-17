@@ -16,16 +16,16 @@ const App: React.FC = () => {
   return (
     <Box>
       <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/signin' element={<Signin />} />
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/about-us' element={<AboutUs />} />
-        <Route path='/privacy-policy' element={<PrivacyPolicy />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/signin" element={<Signin />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route element={<PrivateRoutes />}>
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/dashboard' element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
-        <Route path='*' element={<PageNotFound />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
 
       <SnackbarAlert />

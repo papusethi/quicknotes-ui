@@ -42,77 +42,77 @@ const Signin: React.FC = () => {
   };
 
   return (
-    <Container maxWidth='lg'>
+    <Container maxWidth="lg">
       <Box py={8}>
-        <Container maxWidth='sm'>
-          <Box textAlign='center'>
-            <StyledLink to='/#'>
-              <Typography variant='h4' display='inline-block'>
+        <Container maxWidth="sm">
+          <Box textAlign="center">
+            <StyledLink to="/#">
+              <Typography variant="h4" display="inline-block">
                 QuikNotes.
               </Typography>
             </StyledLink>
-            <Typography variant='body2' textAlign='center'>
+            <Typography variant="body2" textAlign="center">
               sign in to your account to view your notes
             </Typography>
           </Box>
           <Box m={4}>
-            <Card variant='outlined'>
+            <Card variant="outlined">
               <CardContent>
-                <Box display='flex' flexDirection='column' gap={2}>
+                <Box display="flex" flexDirection="column" gap={2}>
                   <TextField
                     required
                     fullWidth
-                    type='text'
-                    variant='standard'
-                    name='email'
-                    label='Email'
-                    size='small'
+                    type="text"
+                    variant="standard"
+                    name="email"
+                    label="Email"
+                    size="small"
                     value={formData.email}
                     onChange={handleChange}
                   />
                   <TextField
                     required
                     fullWidth
-                    type='password'
-                    variant='standard'
-                    name='password'
-                    label='Password'
-                    size='small'
+                    type="password"
+                    variant="standard"
+                    name="password"
+                    label="Password"
+                    size="small"
                     value={formData.password}
                     onChange={handleChange}
                   />
 
                   <Button
-                    size='small'
-                    variant='contained'
+                    size="small"
+                    variant="contained"
                     disableElevation
                     disabled={loading}
                     onClick={handleClickSignin}
                   >
                     {loading ? "Signing in..." : "Sign in me"}
-                    <ArrowForwardOutlinedIcon fontSize='small' sx={{ ml: 1 }} />
+                    <ArrowForwardOutlinedIcon fontSize="small" sx={{ ml: 1 }} />
                   </Button>
                 </Box>
               </CardContent>
             </Card>
           </Box>
 
-          <Box textAlign='center'>
-            <Typography variant='body2'>
+          <Box textAlign="center">
+            <Typography variant="body2">
               Geez, I'm new here,{" "}
-              <StyledLink to='/signup'>
+              <StyledLink to="/signup">
                 <Typography
-                  component='span'
-                  variant='body2'
-                  color='primary'
+                  component="span"
+                  variant="body2"
+                  color="primary"
                   sx={{ "&:hover": { textDecoration: "underline" } }}
                 >
                   Crete an account
                 </Typography>
               </StyledLink>
             </Typography>
-            <StyledLink to='/privacy-policy'>
-              <Typography component='span' variant='body2' sx={{ "&:hover": { textDecoration: "underline" } }}>
+            <StyledLink to="/privacy-policy">
+              <Typography component="span" variant="body2" sx={{ "&:hover": { textDecoration: "underline" } }}>
                 Privacy policy
               </Typography>
             </StyledLink>
