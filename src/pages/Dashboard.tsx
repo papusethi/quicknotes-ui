@@ -58,7 +58,7 @@ const Dashboard: React.FC = () => {
     setCurrentNote(null);
   };
 
-  const handleClickDeleteNote = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+  const handleClickDeleteNote = async (event: React.MouseEvent<HTMLLIElement, MouseEvent>, note: INote) => {
     event?.stopPropagation();
 
     try {
@@ -120,6 +120,19 @@ const Dashboard: React.FC = () => {
     setCurrentNote(note);
   };
 
+  const handleClickMakeCopy = async (event: React.MouseEvent<HTMLLIElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    const { _id, ...restNote } = note;
+    const newNote = { ...restNote };
+
+    try {
+      const { data } = await axiosInstance.post(`/note`, JSON.stringify(newNote));
+      dispatch(setUserNotes(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
   const unarchivedNotes: INote[] = [];
   const archivedNotes: INote[] = [];
 
@@ -153,6 +166,7 @@ const Dashboard: React.FC = () => {
             onClickArchive={handleClickArchive}
             onClickRemoveTag={handleClickRemoveTag}
             onClickCard={handleClickCard}
+            onClickMakeCopy={handleClickMakeCopy}
           />
         </Box>
       )
@@ -191,6 +205,7 @@ const Dashboard: React.FC = () => {
             onClickArchive={handleClickArchive}
             onClickRemoveTag={handleClickRemoveTag}
             onClickCard={handleClickCard}
+            onClickMakeCopy={handleClickMakeCopy}
           />
         </Box>
       )

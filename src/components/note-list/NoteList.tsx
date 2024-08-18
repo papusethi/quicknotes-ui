@@ -4,7 +4,7 @@ import { INote } from "../../pages/Dashboard";
 import { useAppSelector } from "../../redux/hooks";
 import NoteItem from "../note-item/NoteItem";
 
-interface INoteList {
+interface INoteListProps {
   notes: Array<INote>;
   emptyState: {
     Icon: React.ReactNode;
@@ -18,9 +18,10 @@ interface INoteList {
   onClickBgOptions: Function;
   onClickArchive: Function;
   onClickCard: Function;
+  onClickMakeCopy: Function;
 }
 
-const NoteList: React.FC<INoteList> = (props) => {
+const NoteList: React.FC<INoteListProps> = (props) => {
   const {
     notes,
     emptyState,
@@ -30,7 +31,8 @@ const NoteList: React.FC<INoteList> = (props) => {
     onClickRemindMe,
     onClickBgOptions,
     onClickArchive,
-    onClickCard
+    onClickCard,
+    onClickMakeCopy
   } = props;
 
   const userPreferences = useAppSelector((state) => state.user.userPreferences);
@@ -56,6 +58,7 @@ const NoteList: React.FC<INoteList> = (props) => {
                 onClickArchive={onClickArchive}
                 onClickRemoveTag={onClickRemoveTag}
                 onClickCard={onClickCard}
+                onClickMakeCopy={onClickMakeCopy}
               />
             );
           })}

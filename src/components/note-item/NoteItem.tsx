@@ -1,16 +1,31 @@
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
+import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
-import { Box, Card, CardActions, CardContent, Chip, IconButton, Tooltip, Typography } from "@mui/material";
-import React, { Fragment } from "react";
+import {
+  Box,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  IconButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography
+} from "@mui/material";
+import React, { Fragment, useState } from "react";
 import { INote } from "../../pages/Dashboard";
 import { AVAILABLE_COLORS, IAvailableColors } from "../color";
 
-interface INoteItem {
+interface INoteItemProps {
   note: INote;
   onClickPinNote: Function;
   onClickRemoveTag: Function;
@@ -19,9 +34,10 @@ interface INoteItem {
   onClickBgOptions: Function;
   onClickArchive: Function;
   onClickCard: Function;
+  onClickMakeCopy: Function;
 }
 
-const NoteItem: React.FC<INoteItem> = (props) => {
+const NoteItem: React.FC<INoteItemProps> = (props) => {
   const {
     note,
     onClickPinNote,
@@ -30,19 +46,35 @@ const NoteItem: React.FC<INoteItem> = (props) => {
     onClickRemindMe,
     onClickBgOptions,
     onClickArchive,
-    onClickCard
+    onClickCard,
+    onClickMakeCopy
   } = props;
 
   const { title, description, tags, isPinned, isArchived, color } = note;
 
+  const [openMoreMenu, setOpenMoreMenu] = useState(false);
+  const [moreAnchorEle, setMoreAnchorEle] = useState<null | Element>(null);
+
   const actionButtons = [
-    { title: "Delete note", Icon: <DeleteForeverOutlinedIcon fontSize="small" />, onClick: onClickDeleteNote },
     { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: onClickRemindMe },
     { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: onClickBgOptions },
     {
       title: isArchived ? "Unarchive" : "Archive",
       Icon: isArchived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />,
       onClick: onClickArchive
+    }
+  ];
+
+  const moreActionOptions = [
+    {
+      title: "Make a copy",
+      Icon: <ContentCopyOutlinedIcon fontSize="small" />,
+      onClick: onClickMakeCopy
+    },
+    {
+      title: "Delete note",
+      Icon: <DeleteForeverOutlinedIcon fontSize="small" />,
+      onClick: onClickDeleteNote
     }
   ];
 
@@ -99,6 +131,47 @@ const NoteItem: React.FC<INoteItem> = (props) => {
             </Tooltip>
           </Fragment>
         ))}
+
+        <Tooltip title="More">
+          <IconButton
+            id="more"
+            size="small"
+            onClick={(event) => {
+              event.stopPropagation();
+              setMoreAnchorEle((prev) => (prev ? null : event.currentTarget));
+              setOpenMoreMenu((prev) => !prev);
+            }}
+          >
+            <MoreVertOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+
+        <Menu
+          id="more-menu"
+          open={openMoreMenu}
+          anchorEl={moreAnchorEle}
+          onClose={(event: any) => {
+            event?.stopPropagation();
+            setMoreAnchorEle(null);
+            setOpenMoreMenu(false);
+          }}
+          MenuListProps={{ "aria-labelledby": "more" }}
+        >
+          {moreActionOptions.map(({ title, Icon, onClick }) => (
+            <MenuItem
+              key={title}
+              onClick={(event) => {
+                event?.stopPropagation();
+                setMoreAnchorEle(null);
+                setOpenMoreMenu(false);
+                onClick(event, note);
+              }}
+            >
+              <ListItemIcon>{Icon}</ListItemIcon>
+              <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
+            </MenuItem>
+          ))}
+        </Menu>
       </CardActions>
     </Card>
   );

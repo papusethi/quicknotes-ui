@@ -1,5 +1,6 @@
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
 import {
@@ -10,7 +11,6 @@ import {
   CardContent,
   ClickAwayListener,
   IconButton,
-  TextField,
   Tooltip,
   Typography
 } from "@mui/material";
@@ -20,6 +20,8 @@ import { INote } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
+import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
+import ContentNoteView from "../content-note-view/ContentNoteView";
 
 const newNoteInitData: INote = {
   title: "",
@@ -35,7 +37,9 @@ const CreateNote: React.FC = () => {
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
-  const [openNewNote, setOpenNewNote] = useState(false);
+  const [expandCard, setExpandCard] = useState(false);
+  const [contentViewType, setContentViewType] = useState<"note-view" | "checklist-view">("note-view");
+
   const [noteData, setNoteData] = useState<INote>(newNoteInitData);
 
   const handleClickAway = async (event: MouseEvent | TouchEvent) => {
@@ -48,7 +52,14 @@ const CreateNote: React.FC = () => {
   };
 
   const handleClickCard = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    setOpenNewNote(true);
+    setExpandCard(true);
+    setContentViewType("note-view");
+  };
+
+  const handleClickChecklist = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation();
+    setExpandCard(true);
+    setContentViewType("checklist-view");
   };
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,13 +90,13 @@ const CreateNote: React.FC = () => {
       try {
         const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
         dispatch(setUserNotes(data?.data));
-        setOpenNewNote(false);
+        setExpandCard(false);
         setNoteData(newNoteInitData);
       } catch (error: any) {
         dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
       }
     } else {
-      setOpenNewNote(false);
+      setExpandCard(false);
     }
   };
 
@@ -109,65 +120,49 @@ const CreateNote: React.FC = () => {
 
   return (
     <ClickAwayListener onClickAway={handleClickAway}>
-      <Box mx="auto" mt={1} mb={3} width="50%">
-        <Card elevation={3} onClick={handleClickCard}>
-          {openNewNote ? (
-            <Fragment>
-              <CardContent>
-                <TextField
-                  fullWidth
-                  multiline
-                  size="small"
-                  variant="standard"
-                  name="title"
-                  placeholder="Untitled note"
-                  inputProps={{ style: { fontSize: 20 } }}
-                  InputProps={{ disableUnderline: true }}
-                  value={noteData.title}
-                  onChange={handleChangeNoteFields}
-                />
+      <Box mx="auto" mt={1} mb={3} width="60%">
+        {expandCard ? (
+          <Card elevation={3}>
+            <CardContent>
+              {contentViewType === "note-view" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
 
-                <Box mt={1}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    autoFocus
-                    size="small"
-                    variant="standard"
-                    name="description"
-                    placeholder="Take a note..."
-                    inputProps={{ style: { fontSize: 14 } }}
-                    InputProps={{ disableUnderline: true }}
-                    value={noteData.description}
-                    onChange={handleChangeNoteFields}
-                  />
-                </Box>
-              </CardContent>
+              {contentViewType === "checklist-view" && (
+                <ContentChecklistView note={noteData} onUpdate={handleChangeNoteFields} />
+              )}
+            </CardContent>
 
-              <CardActions>
-                {actionButtons.map(({ title, Icon, onClick }) => (
-                  <Fragment key={title}>
-                    <Tooltip title={title}>
-                      <IconButton size="small" onClick={onClick}>
-                        {Icon}
-                      </IconButton>
-                    </Tooltip>
-                  </Fragment>
-                ))}
+            <CardActions>
+              {actionButtons.map(({ title, Icon, onClick }) => (
+                <Fragment key={title}>
+                  <Tooltip title={title}>
+                    <IconButton size="small" onClick={onClick}>
+                      {Icon}
+                    </IconButton>
+                  </Tooltip>
+                </Fragment>
+              ))}
 
-                <Box flex={1} display="flex" justifyContent="flex-end" alignItems="center">
-                  <Button size="small" onClick={handleClickClose}>
-                    Close
-                  </Button>
-                </Box>
-              </CardActions>
-            </Fragment>
-          ) : (
-            <Box p={2}>
-              <Typography fontWeight={500}>Take a note...</Typography>
+              <Box flex={1} display="flex" justifyContent="flex-end" alignItems="center">
+                <Button size="small" onClick={handleClickClose}>
+                  Close
+                </Button>
+              </Box>
+            </CardActions>
+          </Card>
+        ) : (
+          <Card elevation={3} onClick={handleClickCard}>
+            <Box px={2} py={1} display="flex" alignItems="center">
+              <Typography flex={1} fontWeight={500}>
+                Take a note...
+              </Typography>
+              <Tooltip title="Make a list">
+                <IconButton size="small" onClick={handleClickChecklist}>
+                  <CheckBoxOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
             </Box>
-          )}
-        </Card>
+          </Card>
+        )}
       </Box>
     </ClickAwayListener>
   );

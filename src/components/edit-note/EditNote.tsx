@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
 import { AVAILABLE_COLORS } from "../color";
 
-interface IEditNote {
+interface IEditNoteProps {
   open: boolean;
   note: INote | null;
   onClose: () => void;
@@ -25,7 +25,7 @@ const newNoteInitData: INote = {
   color: null
 };
 
-const EditNote: React.FC<IEditNote> = (props) => {
+const EditNote: React.FC<IEditNoteProps> = (props) => {
   const { open, note, onClose } = props;
 
   const dispatch = useAppDispatch();
@@ -47,6 +47,7 @@ const EditNote: React.FC<IEditNote> = (props) => {
     }
 
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       timeoutRef.current && clearTimeout(timeoutRef.current);
     };
   }, [note, open]);
