@@ -1,5 +1,7 @@
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import CheckBoxOutlineBlankOutlinedIcon from "@mui/icons-material/CheckBoxOutlineBlankOutlined";
+import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
@@ -14,6 +16,8 @@ import {
   CardContent,
   Chip,
   IconButton,
+  List,
+  ListItem,
   ListItemIcon,
   ListItemText,
   Menu,
@@ -22,7 +26,7 @@ import {
   Typography
 } from "@mui/material";
 import React, { Fragment, useState } from "react";
-import { INote } from "../../pages/Dashboard";
+import { INote, ITaskItem } from "../../pages/Dashboard";
 import { AVAILABLE_COLORS, IAvailableColors } from "../color";
 
 interface INoteItemProps {
@@ -50,10 +54,21 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     onClickMakeCopy
   } = props;
 
-  const { title, description, tags, isPinned, isArchived, color } = note;
+  const { title, description, tags, isPinned, isArchived, color, tasks } = note;
 
   const [openMoreMenu, setOpenMoreMenu] = useState(false);
   const [moreAnchorEle, setMoreAnchorEle] = useState<null | Element>(null);
+
+  const bucketItems: ITaskItem[] = [];
+  const completedItems: ITaskItem[] = [];
+
+  tasks?.forEach((item) => {
+    if (item.checked) {
+      completedItems.push(item);
+    } else {
+      bucketItems.push(item);
+    }
+  });
 
   const actionButtons = [
     { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: onClickRemindMe },
@@ -106,6 +121,48 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
         <Typography whiteSpace="pre-wrap" variant="body2" mt={1}>
           {description}
         </Typography>
+
+        {Array.isArray(tasks) && tasks.length ? (
+          <List disablePadding>
+            {bucketItems.map((taskItem) => {
+              const { title, checked, order } = taskItem;
+              return (
+                <ListItem key={order} disablePadding>
+                  <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
+                    <IconButton size="small" tabIndex={-1} aria-hidden="true">
+                      {checked ? (
+                        <CheckBoxOutlinedIcon fontSize="small" />
+                      ) : (
+                        <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+                      )}
+                    </IconButton>
+
+                    <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
+                  </Box>
+                </ListItem>
+              );
+            })}
+
+            {completedItems.map((taskItem) => {
+              const { title, checked, order } = taskItem;
+              return (
+                <ListItem key={order} disablePadding>
+                  <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
+                    <IconButton size="small" tabIndex={-1} aria-hidden="true">
+                      {checked ? (
+                        <CheckBoxOutlinedIcon fontSize="small" />
+                      ) : (
+                        <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+                      )}
+                    </IconButton>
+
+                    <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
+                  </Box>
+                </ListItem>
+              );
+            })}
+          </List>
+        ) : null}
 
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1} mt={1}>
           {tags?.map((tag) => (
