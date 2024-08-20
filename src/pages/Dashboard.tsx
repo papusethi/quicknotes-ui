@@ -133,7 +133,7 @@ const Dashboard: React.FC = () => {
     const newNote = { ...restNote };
 
     try {
-      const { data } = await axiosInstance.post(`/note`, JSON.stringify(newNote));
+      const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
       dispatch(setUserNotes(data?.data));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));

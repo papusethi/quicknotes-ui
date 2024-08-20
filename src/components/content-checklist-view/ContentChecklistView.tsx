@@ -67,8 +67,7 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
   const handleClickMarkAsChecked = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, task: ITaskItem) => {
     const updatedTaskList = taskList?.map((eachItem) => {
       if (eachItem.order === task.order) {
-        eachItem.checked = true;
-        return eachItem;
+        return { ...eachItem, checked: true };
       } else {
         return eachItem;
       }
@@ -80,8 +79,7 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
   const handleClickMarkAsUnchecked = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, task: ITaskItem) => {
     const updatedTaskList = taskList?.map((eachItem) => {
       if (eachItem.order === task.order) {
-        eachItem.checked = false;
-        return eachItem;
+        return { ...eachItem, checked: false };
       } else {
         return eachItem;
       }

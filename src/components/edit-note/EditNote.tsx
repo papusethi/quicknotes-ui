@@ -1,14 +1,16 @@
 import { Check } from "@mui/icons-material";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import { Box, Button, Chip, Dialog, DialogActions, DialogContent, IconButton, TextField, Tooltip } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, IconButton, Tooltip } from "@mui/material";
 import React, { Fragment, useEffect, useRef, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
-import { INote } from "../../pages/Dashboard";
+import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
 import { AVAILABLE_COLORS } from "../color";
+import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
+import ContentNoteView from "../content-note-view/ContentNoteView";
 import { newNoteInitData } from "../create-note/CreateNote";
 
 interface IEditNoteProps {
@@ -50,6 +52,11 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
     setNoteData(updateNote);
   };
 
+  const handleUpdateInChecklistView = (tasks: ITaskItem[] | null) => {
+    const updateNote = { ...noteData, tasks: tasks };
+    setNoteData(updateNote);
+  };
+
   const handleClickNotePinned = () => {
     const updateNote = { ...noteData, isPinned: !noteData.isPinned };
     setNoteData(updateNote);
@@ -60,17 +67,15 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
     setNoteData(updateNote);
   };
 
-  const handleClickDeleteTag = (tag: string) => {
-    const updatedTags = noteData?.tags?.filter((item) => item !== tag);
-    const updateNote = { ...noteData, tags: updatedTags };
-    setNoteData(updateNote);
-  };
-
   const handleSaveNote = async () => {
-    if (noteData.title.trim() || noteData.description.trim()) {
+    if (
+      noteData.title.trim() ||
+      noteData.description.trim() ||
+      (Array.isArray(noteData.tasks) && noteData.tasks.length)
+    ) {
       const newNote = { ...noteData, userId: currentUser?._id };
       try {
-        const { data } = await axiosInstance.put("/note/" + noteData._id, JSON.stringify(newNote));
+        const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(newNote));
         dispatch(setUserNotes(data?.data));
         onClose();
       } catch (error: any) {
@@ -81,50 +86,20 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
     }
   };
 
+  const contentViewType: "note-view" | "checklist-view" = note?.tasks ? "checklist-view" : "note-view";
+
   return (
     <Dialog open={open} maxWidth="sm" fullWidth onClose={handleSaveNote}>
       <DialogContent>
-        <TextField
-          fullWidth
-          multiline
-          size="small"
-          variant="standard"
-          name="title"
-          placeholder="Untitled note"
-          inputProps={{ style: { fontSize: 20 } }}
-          InputProps={{ disableUnderline: true }}
-          value={noteData.title}
-          onChange={handleChangeNoteFields}
-        />
+        {contentViewType === "note-view" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
 
-        <Box mt={1}>
-          <TextField
-            fullWidth
-            multiline
-            autoFocus
-            size="small"
-            variant="standard"
-            name="description"
-            placeholder="Take a note..."
-            inputProps={{ style: { fontSize: 14 } }}
-            InputProps={{ disableUnderline: true }}
-            value={noteData.description}
-            onChange={handleChangeNoteFields}
+        {contentViewType === "checklist-view" && (
+          <ContentChecklistView
+            note={noteData}
+            onUpdateTitle={handleChangeNoteFields}
+            onUpdateTasks={handleUpdateInChecklistView}
           />
-
-          <Box mt={2} display="flex" flexDirection="row" flexWrap="wrap" gap={1}>
-            {noteData?.tags?.map((tag) => (
-              <Chip
-                key={tag}
-                label={tag}
-                size="small"
-                color="default"
-                variant="outlined"
-                onDelete={() => handleClickDeleteTag(tag)}
-              />
-            ))}
-          </Box>
-        </Box>
+        )}
       </DialogContent>
 
       <DialogActions>
