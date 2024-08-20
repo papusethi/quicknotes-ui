@@ -6,21 +6,16 @@ import DragIndicatorOutlinedIcon from "@mui/icons-material/DragIndicatorOutlined
 import KeyboardReturnOutlinedIcon from "@mui/icons-material/KeyboardReturnOutlined";
 import { Box, Divider, IconButton, List, ListItem, ListSubheader, TextField, Tooltip } from "@mui/material";
 import React, { Fragment, useState } from "react";
-import { INote } from "../../pages/Dashboard";
-
-interface INoteTaskItem {
-  title: string;
-  checked: boolean;
-  order: number;
-}
+import { INote, ITaskItem } from "../../pages/Dashboard";
 
 interface IContentChecklistViewProps {
   note: INote;
-  onUpdate: Function;
+  onUpdateTitle: Function;
+  onUpdateTasks: Function;
 }
 
 const updateTaskOrderValue = (arr: any[]) => {
-  if (arr && arr.length) {
+  if (Array.isArray(arr) && arr.length) {
     return arr.map((item, index) => ({ ...item, order: index }));
   } else {
     return [];
@@ -28,11 +23,27 @@ const updateTaskOrderValue = (arr: any[]) => {
 };
 
 const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
-  const { note, onUpdate } = props;
+  const { note, onUpdateTitle, onUpdateTasks } = props;
 
-  const [taskList, setTaskList] = useState<INoteTaskItem[] | null>(null);
+  const taskList = note.tasks;
 
   const [newItemTitle, setNewItemTitle] = useState("");
+
+  const addItemToList = () => {
+    if (newItemTitle.trim()) {
+      const newTaskItem = { title: newItemTitle, checked: false, order: -1 };
+      let updatedTaskList: ITaskItem[] = [];
+      updatedTaskList = [...(taskList ?? []), newTaskItem];
+      updatedTaskList = updateTaskOrderValue(updatedTaskList);
+      onUpdateTasks(updatedTaskList);
+      setNewItemTitle("");
+    }
+  };
+
+  const removeItemFromList = (task: ITaskItem) => {
+    const updatedTaskList = taskList?.filter((eachItem) => eachItem.order !== task.order);
+    onUpdateTasks(updatedTaskList ?? null);
+  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = event.target.value;
@@ -49,17 +60,38 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
     addItemToList();
   };
 
-  const addItemToList = () => {
-    const newTaskItem = { title: newItemTitle, checked: false, order: -1 };
-    let updatedTaskList: INoteTaskItem[] = [];
-    updatedTaskList = [...(taskList ?? []), newTaskItem];
-    updatedTaskList = updateTaskOrderValue(updatedTaskList);
-    setTaskList(updatedTaskList);
-    setNewItemTitle("");
+  const handleClickRemove = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, task: ITaskItem) => {
+    removeItemFromList(task);
   };
 
-  const bucketItems: INoteTaskItem[] = [];
-  const completedItems: INoteTaskItem[] = [];
+  const handleClickMarkAsChecked = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, task: ITaskItem) => {
+    const updatedTaskList = taskList?.map((eachItem) => {
+      if (eachItem.order === task.order) {
+        eachItem.checked = true;
+        return eachItem;
+      } else {
+        return eachItem;
+      }
+    });
+
+    updatedTaskList && onUpdateTasks(updatedTaskList);
+  };
+
+  const handleClickMarkAsUnchecked = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, task: ITaskItem) => {
+    const updatedTaskList = taskList?.map((eachItem) => {
+      if (eachItem.order === task.order) {
+        eachItem.checked = false;
+        return eachItem;
+      } else {
+        return eachItem;
+      }
+    });
+
+    updatedTaskList && onUpdateTasks(updatedTaskList);
+  };
+
+  const bucketItems: ITaskItem[] = [];
+  const completedItems: ITaskItem[] = [];
 
   taskList?.forEach((item) => {
     if (item.checked) {
@@ -81,7 +113,7 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
         inputProps={{ style: { fontSize: 20 } }}
         InputProps={{ disableUnderline: true }}
         value={note.title}
-        onChange={(event) => onUpdate(event)}
+        onChange={(event) => onUpdateTitle(event)}
       />
 
       <Box mt={1}>
@@ -126,40 +158,43 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
               </ListSubheader>
             }
           >
-            {bucketItems.map(({ title, checked, order }) => (
-              <ListItem key={order} disablePadding>
-                <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
-                  <DragIndicatorOutlinedIcon fontSize="small" color="action" aria-hidden="true" />
+            {bucketItems.map((taskItem) => {
+              const { title, checked, order } = taskItem;
+              return (
+                <ListItem key={order} disablePadding>
+                  <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
+                    <DragIndicatorOutlinedIcon fontSize="small" color="action" aria-hidden="true" />
 
-                  <IconButton size="small">
-                    {checked ? (
-                      <CheckBoxOutlinedIcon fontSize="small" />
-                    ) : (
-                      <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
-                    )}
-                  </IconButton>
-
-                  <TextField
-                    fullWidth
-                    multiline
-                    size="small"
-                    variant="standard"
-                    name="title"
-                    placeholder="List item"
-                    inputProps={{ style: { fontSize: 14 } }}
-                    InputProps={{ disableUnderline: true }}
-                    sx={{ marginTop: 0.5 }}
-                    value={title}
-                    // onChange={handleChangeNoteFields}
-                  />
-                  <Tooltip title="Delete">
-                    <IconButton size="small">
-                      <CloseOutlinedIcon fontSize="small" />
+                    <IconButton size="small" onClick={(event) => handleClickMarkAsChecked(event, taskItem)}>
+                      {checked ? (
+                        <CheckBoxOutlinedIcon fontSize="small" />
+                      ) : (
+                        <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+                      )}
                     </IconButton>
-                  </Tooltip>
-                </Box>
-              </ListItem>
-            ))}
+
+                    <TextField
+                      fullWidth
+                      multiline
+                      size="small"
+                      variant="standard"
+                      name="title"
+                      placeholder="List item"
+                      inputProps={{ style: { fontSize: 14 } }}
+                      InputProps={{ disableUnderline: true }}
+                      sx={{ marginTop: 0.5 }}
+                      value={title}
+                      // onChange={handleChangeNoteFields}
+                    />
+                    <Tooltip title="Remove">
+                      <IconButton size="small" onClick={(event) => handleClickRemove(event, taskItem)}>
+                        <CloseOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </ListItem>
+              );
+            })}
           </List>
         ) : null}
 
@@ -172,38 +207,41 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
               </ListSubheader>
             }
           >
-            {completedItems.map(({ title, checked, order }) => (
-              <ListItem key={order} disablePadding>
-                <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
-                  <IconButton size="small">
-                    {checked ? (
-                      <CheckBoxOutlinedIcon fontSize="small" />
-                    ) : (
-                      <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
-                    )}
-                  </IconButton>
-
-                  <TextField
-                    fullWidth
-                    multiline
-                    size="small"
-                    variant="standard"
-                    name="title"
-                    placeholder="List item"
-                    inputProps={{ style: { fontSize: 14 } }}
-                    InputProps={{ disableUnderline: true }}
-                    sx={{ marginTop: 0.5 }}
-                    value={title}
-                    // onChange={handleChangeNoteFields}
-                  />
-                  <Tooltip title="Delete">
-                    <IconButton size="small">
-                      <CloseOutlinedIcon fontSize="small" />
+            {completedItems.map((taskItem) => {
+              const { title, checked, order } = taskItem;
+              return (
+                <ListItem key={order} disablePadding>
+                  <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
+                    <IconButton size="small" onClick={(event) => handleClickMarkAsUnchecked(event, taskItem)}>
+                      {checked ? (
+                        <CheckBoxOutlinedIcon fontSize="small" />
+                      ) : (
+                        <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+                      )}
                     </IconButton>
-                  </Tooltip>
-                </Box>
-              </ListItem>
-            ))}
+
+                    <TextField
+                      fullWidth
+                      multiline
+                      size="small"
+                      variant="standard"
+                      name="title"
+                      placeholder="List item"
+                      inputProps={{ style: { fontSize: 14 } }}
+                      InputProps={{ disableUnderline: true }}
+                      sx={{ marginTop: 0.5 }}
+                      value={title}
+                      // onChange={handleChangeNoteFields}
+                    />
+                    <Tooltip title="Remove">
+                      <IconButton size="small" onClick={(event) => handleClickRemove(event, taskItem)}>
+                        <CloseOutlinedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </ListItem>
+              );
+            })}
           </List>
         ) : null}
       </Box>

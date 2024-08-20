@@ -16,20 +16,21 @@ import {
 } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
-import { INote } from "../../pages/Dashboard";
+import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
 
-const newNoteInitData: INote = {
+export const newNoteInitData: INote = {
   title: "",
   description: "",
   tags: [],
   isPinned: false,
   isArchived: false,
-  color: null
+  color: null,
+  tasks: null
 };
 
 const CreateNote: React.FC = () => {
@@ -68,6 +69,11 @@ const CreateNote: React.FC = () => {
     setNoteData(updateNote);
   };
 
+  const handleUpdateInChecklistView = (tasks: ITaskItem[] | null) => {
+    const updateNote = { ...noteData, tasks: tasks };
+    setNoteData(updateNote);
+  };
+
   const handleClickRemindMe = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
     console.log("remind me clicked");
@@ -85,7 +91,11 @@ const CreateNote: React.FC = () => {
   };
 
   const handleSaveNote = async () => {
-    if (noteData.title.trim() || noteData.description.trim()) {
+    if (
+      noteData.title.trim() ||
+      noteData.description.trim() ||
+      (Array.isArray(noteData.tasks) && noteData.tasks.length)
+    ) {
       const newNote = { ...noteData, userId: currentUser?._id };
       try {
         const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
@@ -97,6 +107,7 @@ const CreateNote: React.FC = () => {
       }
     } else {
       setExpandCard(false);
+      setNoteData(newNoteInitData);
     }
   };
 
@@ -127,7 +138,11 @@ const CreateNote: React.FC = () => {
               {contentViewType === "note-view" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
 
               {contentViewType === "checklist-view" && (
-                <ContentChecklistView note={noteData} onUpdate={handleChangeNoteFields} />
+                <ContentChecklistView
+                  note={noteData}
+                  onUpdateTitle={handleChangeNoteFields}
+                  onUpdateTasks={handleUpdateInChecklistView}
+                />
               )}
             </CardContent>
 

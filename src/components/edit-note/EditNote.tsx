@@ -9,21 +9,13 @@ import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
 import { AVAILABLE_COLORS } from "../color";
+import { newNoteInitData } from "../create-note/CreateNote";
 
 interface IEditNoteProps {
   open: boolean;
   note: INote | null;
   onClose: () => void;
 }
-
-const newNoteInitData: INote = {
-  title: "",
-  description: "",
-  tags: [],
-  isPinned: false,
-  isArchived: false,
-  color: null
-};
 
 const EditNote: React.FC<IEditNoteProps> = (props) => {
   const { open, note, onClose } = props;

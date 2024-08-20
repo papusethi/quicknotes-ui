@@ -17,6 +17,12 @@ import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setUserNotes } from "../redux/userSlice";
 
+export interface ITaskItem {
+  title: string;
+  checked: boolean;
+  order: number;
+}
+
 export interface INote {
   readonly _id?: string;
   title: string;
@@ -25,6 +31,7 @@ export interface INote {
   isPinned: boolean;
   isArchived: boolean;
   color: null | string;
+  tasks: null | ITaskItem[];
 }
 
 const Dashboard: React.FC = () => {

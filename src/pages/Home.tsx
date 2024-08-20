@@ -6,7 +6,18 @@ import GitHubIcon from "@mui/icons-material/GitHub";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
 import PlayCircleOutlinedIcon from "@mui/icons-material/PlayCircleOutlined";
-import { Avatar, Box, Button, Card, CardContent, Chip, Container, Divider, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  Card,
+  CardActions,
+  CardContent,
+  Chip,
+  Container,
+  Divider,
+  Typography
+} from "@mui/material";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { StyledLink } from "../components/styledComponents";
@@ -30,7 +41,7 @@ const Home: React.FC = () => {
 
   return (
     <Container maxWidth="lg">
-      <Box py={2} display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
+      <Box py={2} display="flex" flexDirection="row" justifyContent="space-between" alignItems="center" gap={4}>
         <Box>
           <StyledLink to="/#">
             <Typography variant="h5">QuikNotes.</Typography>
@@ -41,6 +52,7 @@ const Home: React.FC = () => {
           <ul
             style={{
               margin: 0,
+              padding: 0,
               listStyleType: "none",
               display: "flex",
               flexDirection: "row",
@@ -139,12 +151,13 @@ const Home: React.FC = () => {
                   QuikDraw is your pocket-sized digital freeform board to instantly sketch your ideas and thoughts in
                   the cloud.
                 </Typography>
-
+              </CardContent>
+              <CardActions>
                 <Button size="small">
                   Try it
                   <ArrowOutwardIcon fontSize="small" sx={{ ml: 0.5 }} />
                 </Button>
-              </CardContent>
+              </CardActions>
             </Card>
 
             <Card variant="outlined">
@@ -157,11 +170,13 @@ const Home: React.FC = () => {
                   QuikDraw is an industry grade design tool to plot your imagination into design in a collaborative way
                   in the cloud.
                 </Typography>
+              </CardContent>
+              <CardActions>
                 <Button size="small">
                   Try it
                   <ArrowOutwardIcon fontSize="small" sx={{ ml: 0.5 }} />
                 </Button>
-              </CardContent>
+              </CardActions>
             </Card>
 
             <Card variant="outlined">
@@ -174,12 +189,13 @@ const Home: React.FC = () => {
                   QuikJam is a light-weight application to plot business model and software architectural diagrams in a
                   collaborative way in the cloud.
                 </Typography>
-
+              </CardContent>
+              <CardActions>
                 <Button size="small">
                   Try it
                   <ArrowOutwardIcon fontSize="small" sx={{ ml: 0.5 }} />
                 </Button>
-              </CardContent>
+              </CardActions>
             </Card>
           </Box>
         </Box>
@@ -204,7 +220,7 @@ const Home: React.FC = () => {
                     </Typography>
                     <Chip label="Free" size="small" variant="outlined" color="warning" />
                   </Box>
-                  <Box my={2}>
+                  <Box>
                     <ul>
                       <li>
                         <Typography component="span" variant="body2" fontWeight={600}>
@@ -240,12 +256,13 @@ const Home: React.FC = () => {
                       </li>
                     </ul>
                   </Box>
-
+                </CardContent>
+                <CardActions>
                   <Button size="small">
                     Buy now
                     <ArrowOutwardIcon fontSize="small" sx={{ ml: 0.5 }} />
                   </Button>
-                </CardContent>
+                </CardActions>
               </Card>
             </Box>
 
@@ -259,7 +276,7 @@ const Home: React.FC = () => {
                     <Chip label="$0.25/month" size="small" variant="outlined" color="info" />
                   </Box>
 
-                  <Box my={2}>
+                  <Box>
                     <ul>
                       <li>
                         <Typography component="span" variant="body2" fontWeight={600}>
@@ -303,11 +320,13 @@ const Home: React.FC = () => {
                       </li>
                     </ul>
                   </Box>
+                </CardContent>
+                <CardActions>
                   <Button size="small">
                     Buy now
                     <ArrowOutwardIcon fontSize="small" sx={{ ml: 0.5 }} />
                   </Button>
-                </CardContent>
+                </CardActions>
               </Card>
             </Box>
           </Box>
