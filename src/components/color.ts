@@ -1,18 +1,19 @@
-export const AVAILABLE_COLORS = {
-  "red-200": "#ef9a9a",
-  "pink-200": "#f48fb1",
-  "purple-200": "#ce93d8",
-  "deep-purple-200": "#b39ddb",
-  "indigo-200": "#9fa8da",
-  "blue-200": "#90caf9",
-  "light-blue-200": "#81d4fa",
-  "cyan-200": "#80deea",
-  "teal-200": "#80cbc4",
-  "green-200": "#a5d6a7",
-  "yellow-200": "#fff59d",
-  "brown-200": "#bcaaa4",
-  "grey-200": "#eeeeee",
-  "blue-grey-200": "#b0bec5"
+export const LIGHT_THEME_COLORS = {
+  Sand: "#F0F0DC",
+  Sage: "#84A98C",
+  Fog: "#D3D3D3",
+  Storm: "#6495ED",
+  Clay: "#C09853",
+  Chalk: "#D3D3D3"
 };
 
-export type IAvailableColors = keyof typeof AVAILABLE_COLORS;
+export const DARK_THEME_COLORS = {
+  Sand: "#A08569",
+  Sage: "#468450",
+  Fog: "#708090",
+  Storm: "#191970",
+  Clay: "#8B4513",
+  Chalk: "#757575"
+};
+
+export type INoteColors = keyof typeof LIGHT_THEME_COLORS;

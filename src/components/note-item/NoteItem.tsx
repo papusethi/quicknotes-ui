@@ -27,7 +27,9 @@ import {
 } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import { INote, ITaskItem } from "../../pages/Dashboard";
-import { AVAILABLE_COLORS, IAvailableColors } from "../color";
+import { useAppSelector } from "../../redux/hooks";
+import { DARK_THEME_COLORS, INoteColors, LIGHT_THEME_COLORS } from "../color";
+import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 
 interface INoteItemProps {
   note: INote;
@@ -56,8 +58,20 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
 
   const { title, description, tags, isPinned, isArchived, color, tasks } = note;
 
+  const appTheme = useAppSelector((state) => state.app.theme);
+  const currentThemeColors = appTheme === "dark" ? DARK_THEME_COLORS : LIGHT_THEME_COLORS;
+
   const [openMoreMenu, setOpenMoreMenu] = useState(false);
   const [moreAnchorEle, setMoreAnchorEle] = useState<null | Element>(null);
+
+  const [openPopover, setOpenPopover] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | Element>(null);
+
+  const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    setOpenPopover((prev) => !prev);
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
 
   const bucketItems: ITaskItem[] = [];
   const completedItems: ITaskItem[] = [];
@@ -72,7 +86,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
 
   const actionButtons = [
     { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: onClickRemindMe },
-    { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: onClickBgOptions },
+    { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
     {
       title: isArchived ? "Unarchive" : "Archive",
       Icon: isArchived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />,
@@ -97,7 +111,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     <Card
       variant="outlined"
       sx={{
-        bgcolor: color ? AVAILABLE_COLORS[color as IAvailableColors] : "inherit",
+        bgcolor: color ? currentThemeColors[color as INoteColors] : "inherit",
         "&:hover": { boxShadow: (theme) => theme.shadows[4] }
       }}
       onClick={(event) => onClickCard(event, note)}
@@ -229,6 +243,14 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
             </MenuItem>
           ))}
         </Menu>
+
+        <ColorPickerPopover
+          open={openPopover}
+          anchorEl={anchorEl}
+          selectedColor={note?.color}
+          onClose={handleClickBgOptions}
+          onUpdate={(colorKey: string) => onClickBgOptions(colorKey, note)}
+        />
       </CardActions>
     </Card>
   );

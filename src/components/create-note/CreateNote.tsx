@@ -20,6 +20,7 @@ import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
+import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
 
@@ -42,6 +43,9 @@ const CreateNote: React.FC = () => {
   const [contentViewType, setContentViewType] = useState<"note-view" | "checklist-view">("note-view");
 
   const [noteData, setNoteData] = useState<INote>(newNoteInitData);
+
+  const [openPopover, setOpenPopover] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | Element>(null);
 
   const handleClickAway = async (event: MouseEvent | TouchEvent) => {
     await handleSaveNote();
@@ -79,9 +83,15 @@ const CreateNote: React.FC = () => {
     console.log("remind me clicked");
   };
 
-  const handleClickBgOptions = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
-    console.log("bg options clicked");
+    setOpenPopover((prev) => !prev);
+    setAnchorEl(anchorEl ? null : event.currentTarget);
+  };
+
+  const handleClickNoteColor = (colorValue: string) => {
+    const updateNote = { ...noteData, color: noteData.color === colorValue ? null : colorValue };
+    setNoteData(updateNote);
   };
 
   const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -112,16 +122,8 @@ const CreateNote: React.FC = () => {
   };
 
   const actionButtons = [
-    {
-      title: "Remind me",
-      Icon: <AddAlertOutlinedIcon fontSize="small" />,
-      onClick: handleClickRemindMe
-    },
-    {
-      title: "Background options",
-      Icon: <ColorLensOutlinedIcon fontSize="small" />,
-      onClick: handleClickBgOptions
-    },
+    { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: handleClickRemindMe },
+    { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
     {
       title: noteData.isArchived ? "Unarchive" : "Archive",
       Icon: noteData.isArchived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />,
@@ -156,6 +158,14 @@ const CreateNote: React.FC = () => {
                   </Tooltip>
                 </Fragment>
               ))}
+
+              <ColorPickerPopover
+                open={openPopover}
+                anchorEl={anchorEl}
+                selectedColor={noteData?.color}
+                onClose={handleClickBgOptions}
+                onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
+              />
 
               <Box flex={1} display="flex" justifyContent="flex-end" alignItems="center">
                 <Button size="small" onClick={handleClickClose}>

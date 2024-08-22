@@ -1,14 +1,14 @@
-import { Check } from "@mui/icons-material";
+import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import { Box, Button, Dialog, DialogActions, DialogContent, IconButton, Tooltip } from "@mui/material";
-import React, { Fragment, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
 import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
-import { AVAILABLE_COLORS } from "../color";
+import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
 import { newNoteInitData } from "../create-note/CreateNote";
@@ -28,6 +28,9 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
 
   const timeoutRef = useRef<null | NodeJS.Timeout>(null);
   const [noteData, setNoteData] = useState<INote>(newNoteInitData);
+
+  const [openPopover, setOpenPopover] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | Element>(null);
 
   useEffect(() => {
     if (open) {
@@ -60,6 +63,12 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
   const handleClickNotePinned = () => {
     const updateNote = { ...noteData, isPinned: !noteData.isPinned };
     setNoteData(updateNote);
+  };
+
+  const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+    setOpenPopover((prev) => !prev);
+    setAnchorEl(anchorEl ? null : event.currentTarget);
   };
 
   const handleClickNoteColor = (colorValue: string) => {
@@ -103,7 +112,7 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
       </DialogContent>
 
       <DialogActions>
-        <Box display="flex" alignItems="center" gap={0.5}>
+        <Box flex={1} display="flex" alignItems="center" gap={0.5}>
           <Tooltip title={noteData.isPinned ? "Pinned" : "Unpinned"}>
             <IconButton size="small" onClick={handleClickNotePinned}>
               {noteData.isPinned ? (
@@ -114,27 +123,19 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
             </IconButton>
           </Tooltip>
 
-          {Object.entries(AVAILABLE_COLORS).map((entry) => {
-            const [colorKey, colorValue] = entry;
-            return (
-              <Fragment key={colorKey}>
-                <Tooltip title={colorKey}>
-                  <Box
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                    width={24}
-                    height={24}
-                    borderRadius="50%"
-                    bgcolor={colorValue}
-                    onClick={() => handleClickNoteColor(colorKey)}
-                  >
-                    {noteData.color === colorKey && <Check fontSize="small" />}
-                  </Box>
-                </Tooltip>
-              </Fragment>
-            );
-          })}
+          <Tooltip title="Background options">
+            <IconButton size="small" onClick={handleClickBgOptions}>
+              <ColorLensOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <ColorPickerPopover
+            open={openPopover}
+            anchorEl={anchorEl}
+            selectedColor={noteData?.color}
+            onClose={handleClickBgOptions}
+            onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
+          />
         </Box>
 
         <Button size="small" onClick={handleSaveNote}>

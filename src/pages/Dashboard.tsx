@@ -106,9 +106,14 @@ const Dashboard: React.FC = () => {
     console.log("remind me clicked");
   };
 
-  const handleClickBgOptions = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-    console.log("bg options clicked");
+  const handleClickBgOptions = async (colorKey: string | null, note: INote) => {
+    const updateNote = { ...note, color: colorKey };
+    try {
+      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      dispatch(setUserNotes(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
   };
 
   const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
