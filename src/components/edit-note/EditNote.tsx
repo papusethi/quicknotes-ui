@@ -1,8 +1,11 @@
+import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
+import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
 import { Box, Button, Dialog, DialogActions, DialogContent, IconButton, Tooltip } from "@mui/material";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Fragment, useEffect, useRef, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
 import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
@@ -65,6 +68,11 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
     setNoteData(updateNote);
   };
 
+  const handleClickRemindMe = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+    console.log("remind me clicked");
+  };
+
   const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
     setOpenPopover((prev) => !prev);
@@ -73,6 +81,12 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
 
   const handleClickNoteColor = (colorValue: string) => {
     const updateNote = { ...noteData, color: noteData.color === colorValue ? null : colorValue };
+    setNoteData(updateNote);
+  };
+
+  const handleClickArchive = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+    const updateNote = { ...noteData, isArchived: !noteData.isArchived };
     setNoteData(updateNote);
   };
 
@@ -94,6 +108,16 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
       onClose();
     }
   };
+
+  const actionButtons = [
+    { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: handleClickRemindMe },
+    { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
+    {
+      title: noteData.isArchived ? "Unarchive" : "Archive",
+      Icon: noteData.isArchived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />,
+      onClick: handleClickArchive
+    }
+  ];
 
   const contentViewType: "note-view" | "checklist-view" = note?.tasks ? "checklist-view" : "note-view";
 
@@ -123,11 +147,15 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
             </IconButton>
           </Tooltip>
 
-          <Tooltip title="Background options">
-            <IconButton size="small" onClick={handleClickBgOptions}>
-              <ColorLensOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          {actionButtons.map(({ title, Icon, onClick }) => (
+            <Fragment key={title}>
+              <Tooltip title={title}>
+                <IconButton size="small" onClick={onClick}>
+                  {Icon}
+                </IconButton>
+              </Tooltip>
+            </Fragment>
+          ))}
 
           <ColorPickerPopover
             open={openPopover}
