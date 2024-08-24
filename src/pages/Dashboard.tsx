@@ -27,10 +27,11 @@ export interface INote {
   readonly _id?: string;
   title: string;
   description: string;
-  tags: string[];
+  labels: null | string[];
   isPinned: boolean;
   isArchived: boolean;
   color: null | string;
+  type: "NOTE" | "CHECKLIST";
   tasks: null | ITaskItem[];
 }
 
@@ -88,11 +89,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleClickRemoveTag = async (event: any, note: INote, tag: string) => {
+  const handleClickRemoveLabel = async (event: any, note: INote, label: string) => {
     event?.stopPropagation();
 
-    const updatedTags = note.tags.filter((currentTag) => currentTag !== tag);
-    const updateNote = { ...note, tags: updatedTags };
+    const updatedLabels = note?.labels?.filter((currentLabel) => currentLabel !== label);
+    const updateNote = { ...note, labels: updatedLabels };
     try {
       const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
       dispatch(setUserNotes(data?.data));
@@ -176,7 +177,7 @@ const Dashboard: React.FC = () => {
             onClickRemindMe={handleClickRemindMe}
             onClickBgOptions={handleClickBgOptions}
             onClickArchive={handleClickArchive}
-            onClickRemoveTag={handleClickRemoveTag}
+            onClickRemoveLabel={handleClickRemoveLabel}
             onClickCard={handleClickCard}
             onClickMakeCopy={handleClickMakeCopy}
           />
@@ -215,7 +216,7 @@ const Dashboard: React.FC = () => {
             onClickRemindMe={handleClickRemindMe}
             onClickBgOptions={handleClickBgOptions}
             onClickArchive={handleClickArchive}
-            onClickRemoveTag={handleClickRemoveTag}
+            onClickRemoveLabel={handleClickRemoveLabel}
             onClickCard={handleClickCard}
             onClickMakeCopy={handleClickMakeCopy}
           />

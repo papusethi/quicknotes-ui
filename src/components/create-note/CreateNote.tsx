@@ -27,10 +27,11 @@ import ContentNoteView from "../content-note-view/ContentNoteView";
 export const newNoteInitData: INote = {
   title: "",
   description: "",
-  tags: [],
+  labels: null,
   isPinned: false,
   isArchived: false,
   color: null,
+  type: "NOTE",
   tasks: null
 };
 
@@ -40,9 +41,8 @@ const CreateNote: React.FC = () => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const [expandCard, setExpandCard] = useState(false);
-  const [contentViewType, setContentViewType] = useState<"note-view" | "checklist-view">("note-view");
 
-  const [noteData, setNoteData] = useState<INote>(newNoteInitData);
+  const [noteData, setNoteData] = useState<null | INote>(null);
 
   const [openPopover, setOpenPopover] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | Element>(null);
@@ -58,22 +58,28 @@ const CreateNote: React.FC = () => {
 
   const handleClickCard = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     setExpandCard(true);
-    setContentViewType("note-view");
+    setNoteData({ ...newNoteInitData, type: "NOTE" });
   };
 
   const handleClickChecklist = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     setExpandCard(true);
-    setContentViewType("checklist-view");
+    setNoteData({ ...newNoteInitData, type: "CHECKLIST" });
   };
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!noteData) {
+      return;
+    }
     const { name, value } = event.target;
     const updateNote = { ...noteData, [name]: value };
     setNoteData(updateNote);
   };
 
   const handleUpdateInChecklistView = (tasks: ITaskItem[] | null) => {
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, tasks: tasks };
     setNoteData(updateNote);
   };
@@ -90,17 +96,27 @@ const CreateNote: React.FC = () => {
   };
 
   const handleClickNoteColor = (colorValue: string) => {
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, color: noteData.color === colorValue ? null : colorValue };
     setNoteData(updateNote);
   };
 
   const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, isArchived: !noteData.isArchived };
     setNoteData(updateNote);
   };
 
   const handleSaveNote = async () => {
+    if (!noteData) {
+      return;
+    }
+
     if (
       noteData.title.trim() ||
       noteData.description.trim() ||
@@ -125,8 +141,12 @@ const CreateNote: React.FC = () => {
     { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: handleClickRemindMe },
     { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
     {
-      title: noteData.isArchived ? "Unarchive" : "Archive",
-      Icon: noteData.isArchived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />,
+      title: noteData?.isArchived ? "Unarchive" : "Archive",
+      Icon: noteData?.isArchived ? (
+        <UnarchiveOutlinedIcon fontSize="small" />
+      ) : (
+        <ArchiveOutlinedIcon fontSize="small" />
+      ),
       onClick: handleClickArchive
     }
   ];
@@ -137,9 +157,9 @@ const CreateNote: React.FC = () => {
         {expandCard ? (
           <Card elevation={3}>
             <CardContent>
-              {contentViewType === "note-view" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
+              {noteData?.type === "NOTE" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
 
-              {contentViewType === "checklist-view" && (
+              {noteData?.type === "CHECKLIST" && (
                 <ContentChecklistView
                   note={noteData}
                   onUpdateTitle={handleChangeNoteFields}

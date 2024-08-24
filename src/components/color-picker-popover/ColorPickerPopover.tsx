@@ -1,5 +1,5 @@
 import { Check } from "@mui/icons-material";
-import { Box, Popover, Tooltip, Typography } from "@mui/material";
+import { Box, Popover, Tooltip } from "@mui/material";
 import React, { Fragment } from "react";
 import { useAppSelector } from "../../redux/hooks";
 import { DARK_THEME_COLORS, LIGHT_THEME_COLORS } from "../color";
@@ -7,7 +7,7 @@ import { DARK_THEME_COLORS, LIGHT_THEME_COLORS } from "../color";
 interface IColorPickerPopoverProps {
   open: boolean;
   anchorEl: Element | null;
-  selectedColor: string | null;
+  selectedColor?: string | null;
   onUpdate: Function;
   onClose: Function;
 }

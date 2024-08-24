@@ -30,7 +30,7 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const timeoutRef = useRef<null | NodeJS.Timeout>(null);
-  const [noteData, setNoteData] = useState<INote>(newNoteInitData);
+  const [noteData, setNoteData] = useState<INote | null>(note);
 
   const [openPopover, setOpenPopover] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | Element>(null);
@@ -42,7 +42,7 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
     } else {
       const timeoutId = setTimeout(() => {
         setNoteData(newNoteInitData);
-      }, 4000);
+      }, 2000);
       timeoutRef["current"] = timeoutId;
     }
 
@@ -53,17 +53,26 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
   }, [note, open]);
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!noteData) {
+      return;
+    }
     const { name, value } = event.target;
     const updateNote = { ...noteData, [name]: value };
     setNoteData(updateNote);
   };
 
   const handleUpdateInChecklistView = (tasks: ITaskItem[] | null) => {
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, tasks: tasks };
     setNoteData(updateNote);
   };
 
   const handleClickNotePinned = () => {
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, isPinned: !noteData.isPinned };
     setNoteData(updateNote);
   };
@@ -80,17 +89,27 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
   };
 
   const handleClickNoteColor = (colorValue: string) => {
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, color: noteData.color === colorValue ? null : colorValue };
     setNoteData(updateNote);
   };
 
   const handleClickArchive = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
+    if (!noteData) {
+      return;
+    }
     const updateNote = { ...noteData, isArchived: !noteData.isArchived };
     setNoteData(updateNote);
   };
 
   const handleSaveNote = async () => {
+    if (!noteData) {
+      return;
+    }
+
     if (
       noteData.title.trim() ||
       noteData.description.trim() ||
@@ -113,20 +132,22 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
     { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: handleClickRemindMe },
     { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
     {
-      title: noteData.isArchived ? "Unarchive" : "Archive",
-      Icon: noteData.isArchived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />,
+      title: noteData?.isArchived ? "Unarchive" : "Archive",
+      Icon: noteData?.isArchived ? (
+        <UnarchiveOutlinedIcon fontSize="small" />
+      ) : (
+        <ArchiveOutlinedIcon fontSize="small" />
+      ),
       onClick: handleClickArchive
     }
   ];
 
-  const contentViewType: "note-view" | "checklist-view" = note?.tasks ? "checklist-view" : "note-view";
-
   return (
     <Dialog open={open} maxWidth="sm" fullWidth onClose={handleSaveNote}>
       <DialogContent>
-        {contentViewType === "note-view" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
+        {noteData?.type === "NOTE" && <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />}
 
-        {contentViewType === "checklist-view" && (
+        {noteData?.type === "CHECKLIST" && (
           <ContentChecklistView
             note={noteData}
             onUpdateTitle={handleChangeNoteFields}
@@ -137,9 +158,9 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
 
       <DialogActions>
         <Box flex={1} display="flex" alignItems="center" gap={0.5}>
-          <Tooltip title={noteData.isPinned ? "Pinned" : "Unpinned"}>
+          <Tooltip title={noteData?.isPinned ? "Pinned" : "Unpinned"}>
             <IconButton size="small" onClick={handleClickNotePinned}>
-              {noteData.isPinned ? (
+              {noteData?.isPinned ? (
                 <PushPinIcon fontSize="small" color="primary" sx={{ transform: "rotate(45deg)" }} />
               ) : (
                 <PushPinOutlinedIcon fontSize="small" />

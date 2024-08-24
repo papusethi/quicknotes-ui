@@ -34,7 +34,7 @@ import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 interface INoteItemProps {
   note: INote;
   onClickPinNote: Function;
-  onClickRemoveTag: Function;
+  onClickRemoveLabel: Function;
   onClickDeleteNote: Function;
   onClickRemindMe: Function;
   onClickBgOptions: Function;
@@ -47,7 +47,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   const {
     note,
     onClickPinNote,
-    onClickRemoveTag,
+    onClickRemoveLabel,
     onClickDeleteNote,
     onClickRemindMe,
     onClickBgOptions,
@@ -56,7 +56,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     onClickMakeCopy
   } = props;
 
-  const { title, description, tags, isPinned, isArchived, color, tasks } = note;
+  const { title, description, labels, isPinned, isArchived, color, tasks } = note;
 
   const appTheme = useAppSelector((state) => state.app.theme);
   const currentThemeColors = appTheme === "dark" ? DARK_THEME_COLORS : LIGHT_THEME_COLORS;
@@ -179,14 +179,14 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
         ) : null}
 
         <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1} mt={1}>
-          {tags?.map((tag) => (
+          {labels?.map((label) => (
             <Chip
-              key={tag}
-              label={tag}
+              key={label}
+              label={label}
               size="small"
               color="default"
               variant="outlined"
-              onDelete={(event) => onClickRemoveTag(event, note, tag)}
+              onDelete={(event) => onClickRemoveLabel(event, note, label)}
             />
           ))}
         </Box>
