@@ -1,17 +1,18 @@
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
-import EditIcon from "@mui/icons-material/Edit";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
+import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
 import CreateNote from "../components/create-note/CreateNote";
 import EditNote from "../components/edit-note/EditNote";
 import Header from "../components/header/Header";
+import LabelList from "../components/label-list/LabelList";
 import NoteList from "../components/note-list/NoteList";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -192,11 +193,18 @@ const Dashboard: React.FC = () => {
       content: null
     },
     {
-      id: "editLabels",
-      text: "Edit labels",
-      Icon: EditOutlinedIcon,
-      ActiveIcon: EditIcon,
-      content: null
+      id: "manageLabels",
+      text: "Manage labels",
+      Icon: LocalOfferOutlinedIcon,
+      ActiveIcon: LocalOfferIcon,
+      content: (
+        <Box>
+          <Typography variant="h6">Manage labels</Typography>
+          <Box mt={2}>
+            <LabelList />
+          </Box>
+        </Box>
+      )
     },
     {
       id: "archived",

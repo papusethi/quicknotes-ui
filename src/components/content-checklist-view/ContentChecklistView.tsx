@@ -129,7 +129,7 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
                 inputProps={{ style: { fontSize: 14 } }}
                 InputProps={{
                   disableUnderline: true,
-                  startAdornment: <AssignmentOutlinedIcon fontSize="small" color="action" sx={{ mr: 0.5 }} />
+                  startAdornment: <AssignmentOutlinedIcon fontSize="small" color="action" sx={{ mr: 0.5, mb: 0.25 }} />
                 }}
                 value={newItemTitle}
                 onChange={handleChange}
