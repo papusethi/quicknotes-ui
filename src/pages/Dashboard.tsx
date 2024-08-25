@@ -16,7 +16,12 @@ import LabelList from "../components/label-list/LabelList";
 import NoteList from "../components/note-list/NoteList";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setUserNotes } from "../redux/userSlice";
+import { setUserLabels, setUserNotes } from "../redux/userSlice";
+
+export interface ILabelItem {
+  readonly _id?: string;
+  name: string;
+}
 
 export interface ITaskItem {
   title: string;
@@ -55,7 +60,17 @@ const Dashboard: React.FC = () => {
       }
     };
 
+    const fetchAllLabels = async () => {
+      try {
+        const { data } = await axiosInstance.get("/label");
+        dispatch(setUserLabels(data?.data));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchAllNotes();
+    fetchAllLabels();
   }, [dispatch]);
 
   const handleClickListItem = (newTabId: string) => {
@@ -90,13 +105,11 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleClickRemoveLabel = async (event: any, note: INote, label: string) => {
+  const handleClickUpdateLabel = async (event: any, note: INote) => {
     event?.stopPropagation();
 
-    const updatedLabels = note?.labels?.filter((currentLabel) => currentLabel !== label);
-    const updateNote = { ...note, labels: updatedLabels };
     try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(note));
       dispatch(setUserNotes(data?.data));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
@@ -178,7 +191,7 @@ const Dashboard: React.FC = () => {
             onClickRemindMe={handleClickRemindMe}
             onClickBgOptions={handleClickBgOptions}
             onClickArchive={handleClickArchive}
-            onClickRemoveLabel={handleClickRemoveLabel}
+            onClickUpdateLabel={handleClickUpdateLabel}
             onClickCard={handleClickCard}
             onClickMakeCopy={handleClickMakeCopy}
           />
@@ -224,7 +237,7 @@ const Dashboard: React.FC = () => {
             onClickRemindMe={handleClickRemindMe}
             onClickBgOptions={handleClickBgOptions}
             onClickArchive={handleClickArchive}
-            onClickRemoveLabel={handleClickRemoveLabel}
+            onClickUpdateLabel={handleClickUpdateLabel}
             onClickCard={handleClickCard}
             onClickMakeCopy={handleClickMakeCopy}
           />

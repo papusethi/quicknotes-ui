@@ -1,3 +1,4 @@
+import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import KeyboardReturnOutlinedIcon from "@mui/icons-material/KeyboardReturnOutlined";
@@ -14,36 +15,100 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
-import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { ILabelItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { setUserLabels } from "../../redux/userSlice";
 
-interface ILabelItem {
-  readonly _id?: string;
-  name: string;
+interface ILabelItemProps {
+  labelItem: ILabelItem;
+  onUpdate: Function;
+  onClickDelete: Function;
 }
 
-const LabelList: React.FC = (props) => {
+const LabelItem: React.FC<ILabelItemProps> = (props) => {
+  const { labelItem, onUpdate, onClickDelete } = props;
+
+  const [editMode, setEditMode] = useState(false);
+  const [newLabelName, setNewLabelName] = useState(labelItem.name);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNewLabelName(event.target.value);
+  };
+
+  const handleClickEdit = () => {
+    setEditMode(true);
+    setNewLabelName(labelItem.name);
+  };
+
+  const updateLabelItem = () => {
+    setEditMode(false);
+
+    if (labelItem.name !== newLabelName.trim()) {
+      const updatedLabelItem = { ...labelItem, name: newLabelName };
+      onUpdate(updatedLabelItem);
+    }
+  };
+
+  const handleClickSave = () => {
+    updateLabelItem();
+  };
+
+  const handleKeyUp = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Enter") {
+      updateLabelItem();
+    }
+  };
+
+  return (
+    <ListItem disablePadding>
+      {editMode ? (
+        <TextField
+          fullWidth
+          autoFocus
+          variant="standard"
+          value={newLabelName}
+          onChange={handleChange}
+          onKeyUp={handleKeyUp}
+        />
+      ) : (
+        <ListItemText>{labelItem.name}</ListItemText>
+      )}
+
+      <ListItemSecondaryAction>
+        {editMode ? (
+          <Tooltip title="Save">
+            <IconButton size="small" onClick={handleClickSave}>
+              <CheckOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        ) : (
+          <Tooltip title="Edit">
+            <IconButton size="small" onClick={handleClickEdit}>
+              <EditOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        )}
+
+        <Tooltip title="Delete">
+          <IconButton size="small" onClick={(event) => onClickDelete(event, labelItem)}>
+            <DeleteForeverOutlinedIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      </ListItemSecondaryAction>
+    </ListItem>
+  );
+};
+
+const LabelList: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const userLabels = useAppSelector((state) => state.user.userLabels);
 
-  const [labelsList, setLabelsList] = useState<ILabelItem[]>([]);
   const [newLabelName, setNewLabelName] = useState("");
-
-  useEffect(() => {
-    const fetchAllLabels = async () => {
-      try {
-        const { data } = await axiosInstance.get("/label");
-        setLabelsList(data?.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchAllLabels();
-  }, []);
 
   const addItemToList = async () => {
     if (newLabelName.trim()) {
@@ -51,20 +116,11 @@ const LabelList: React.FC = (props) => {
 
       try {
         const { data } = await axiosInstance.post("/label", JSON.stringify(newLabelItem));
-        setLabelsList(data?.data);
+        dispatch(setUserLabels(data?.data));
         setNewLabelName("");
       } catch (error: any) {
         dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
       }
-    }
-  };
-
-  const removeItemFromList = async (labelItem: ILabelItem) => {
-    try {
-      const { data } = await axiosInstance.delete(`/label/${labelItem._id}`);
-      setLabelsList(data?.data);
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
   };
 
@@ -83,8 +139,22 @@ const LabelList: React.FC = (props) => {
     addItemToList();
   };
 
-  const handleClickRemove = (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, task: ILabelItem) => {
-    removeItemFromList(task);
+  const handleClickUpdate = async (labelItem: ILabelItem) => {
+    try {
+      const { data } = await axiosInstance.put(`/label/${labelItem._id}`, JSON.stringify(labelItem));
+      dispatch(setUserLabels(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
+  const handleClickDelete = async (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, labelItem: ILabelItem) => {
+    try {
+      const { data } = await axiosInstance.delete(`/label/${labelItem._id}`);
+      dispatch(setUserLabels(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
   };
 
   return (
@@ -119,27 +189,16 @@ const LabelList: React.FC = (props) => {
       <Divider sx={{ mt: 0.5 }} />
 
       <Box my={2}>
-        {Array.isArray(labelsList) && labelsList.length ? (
+        {Array.isArray(userLabels) && userLabels.length ? (
           <List disablePadding>
-            {labelsList.map((labelItem) => {
-              const { _id, name } = labelItem;
+            {userLabels.map((labelItem) => {
               return (
-                <ListItem key={_id} disablePadding>
-                  <ListItemText>{name}</ListItemText>
-
-                  <ListItemSecondaryAction>
-                    <Tooltip title="Edit">
-                      <IconButton size="small" onClick={(event) => handleClickRemove(event, labelItem)}>
-                        <EditOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Delete">
-                      <IconButton size="small" onClick={(event) => handleClickRemove(event, labelItem)}>
-                        <DeleteForeverOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </ListItemSecondaryAction>
-                </ListItem>
+                <LabelItem
+                  key={labelItem._id}
+                  labelItem={labelItem}
+                  onUpdate={handleClickUpdate}
+                  onClickDelete={handleClickDelete}
+                />
               );
             })}
           </List>

@@ -3,8 +3,6 @@ import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CheckBoxOutlineBlankOutlinedIcon from "@mui/icons-material/CheckBoxOutlineBlankOutlined";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
-import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
-import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import MoreVertOutlinedIcon from "@mui/icons-material/MoreVertOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
@@ -18,23 +16,22 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
-  Menu,
-  MenuItem,
   Tooltip,
   Typography
 } from "@mui/material";
-import React, { Fragment, useState } from "react";
+import React, { Fragment, useMemo, useRef, useState } from "react";
 import { INote, ITaskItem } from "../../pages/Dashboard";
 import { useAppSelector } from "../../redux/hooks";
 import { DARK_THEME_COLORS, INoteColors, LIGHT_THEME_COLORS } from "../color";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
+import LabelPopover from "../label-popover/LabelPopover";
+import MorePopover from "../more-popover/MorePopover";
 
 interface INoteItemProps {
   note: INote;
   onClickPinNote: Function;
-  onClickRemoveLabel: Function;
+  onClickUpdateLabel: Function;
   onClickDeleteNote: Function;
   onClickRemindMe: Function;
   onClickBgOptions: Function;
@@ -47,7 +44,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   const {
     note,
     onClickPinNote,
-    onClickRemoveLabel,
+    onClickUpdateLabel,
     onClickDeleteNote,
     onClickRemindMe,
     onClickBgOptions,
@@ -61,16 +58,96 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   const appTheme = useAppSelector((state) => state.app.theme);
   const currentThemeColors = appTheme === "dark" ? DARK_THEME_COLORS : LIGHT_THEME_COLORS;
 
-  const [openMoreMenu, setOpenMoreMenu] = useState(false);
-  const [moreAnchorEle, setMoreAnchorEle] = useState<null | Element>(null);
+  const userLabels = useAppSelector((state) => state.user.userLabels);
 
-  const [openPopover, setOpenPopover] = useState(false);
-  const [anchorEl, setAnchorEl] = useState<null | Element>(null);
+  const [openMorePopover, setOpenMorePopover] = useState(false);
+  const [anchorElMorePopover, setAnchorElMorePopover] = useState<null | Element>(null);
+
+  const [openColorPopover, setOpenColorPopover] = useState(false);
+  const [anchorElColorPopover, setAnchorElColorPopover] = useState<null | Element>(null);
+
+  const [openLabelPopover, setOpenLabelPopover] = useState(false);
+  const [anchorElLabelPopover, setAnchorElLabelPopover] = useState<null | Element>(null);
+
+  const moreButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  // User label id and label name mapping for easier to display in note.
+  const labelIdAndNameMapping = useMemo(() => {
+    return userLabels.reduce((acc, eachLabel) => {
+      if (eachLabel._id) {
+        acc[eachLabel._id] = eachLabel.name;
+      }
+      return acc;
+    }, {} as Record<string, string>);
+  }, [userLabels]);
 
   const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
     event?.stopPropagation();
-    setOpenPopover((prev) => !prev);
-    setAnchorEl(anchorEl ? null : event.currentTarget);
+    setOpenColorPopover((prev) => !prev);
+    setAnchorElColorPopover(anchorElColorPopover ? null : event.currentTarget);
+  };
+
+  const handleClickAddLabel = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    event?.stopPropagation();
+    setOpenLabelPopover((prev) => !prev);
+    setAnchorElLabelPopover(anchorElLabelPopover ? null : moreButtonRef?.current);
+  };
+
+  const handleClickMore = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    setOpenMorePopover((prev) => !prev);
+    setAnchorElMorePopover(anchorElMorePopover ? null : event.currentTarget);
+  };
+
+  const handleClickMoreOption = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, optionId: string) => {
+    event.stopPropagation();
+    setOpenMorePopover((prev) => !prev);
+    setAnchorElMorePopover(anchorElMorePopover ? null : event.currentTarget);
+
+    switch (optionId) {
+      case "add-label": {
+        handleClickAddLabel(event);
+        break;
+      }
+      case "make-copy": {
+        onClickMakeCopy(event, note);
+        break;
+      }
+      case "delete-note": {
+        onClickDeleteNote(event, note);
+        break;
+      }
+    }
+  };
+
+  const handleClickLabelOption = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, labelId: string) => {
+    event.stopPropagation();
+
+    if (Array.isArray(note.labels)) {
+      if (note.labels.includes(labelId)) {
+        // Remove existing label
+        const updatedLabels = note?.labels?.filter((eachLabelId) => eachLabelId !== labelId);
+        const updatedNote = { ...note, labels: updatedLabels ?? null };
+        onClickUpdateLabel(event, updatedNote);
+      } else {
+        // Add new label
+        const updatedLabels = [...note.labels, labelId];
+        const updatedNote = { ...note, labels: updatedLabels };
+        onClickUpdateLabel(event, updatedNote);
+      }
+    } else {
+      const updatedLabels = [labelId];
+      const updatedNote = { ...note, labels: updatedLabels };
+      onClickUpdateLabel(event, updatedNote);
+    }
+  };
+
+  const handleClickRemoveLabel = (event: any, labelId: string) => {
+    event.stopPropagation();
+
+    const updatedLabels = note?.labels?.filter((eachLabelId) => eachLabelId !== labelId);
+    const updatedNote = { ...note, labels: updatedLabels ?? null };
+    onClickUpdateLabel(event, updatedNote);
   };
 
   const bucketItems: ITaskItem[] = [];
@@ -94,165 +171,134 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     }
   ];
 
-  const moreActionOptions = [
-    {
-      title: "Make a copy",
-      Icon: <ContentCopyOutlinedIcon fontSize="small" />,
-      onClick: onClickMakeCopy
-    },
-    {
-      title: "Delete note",
-      Icon: <DeleteForeverOutlinedIcon fontSize="small" />,
-      onClick: onClickDeleteNote
-    }
-  ];
-
   return (
-    <Card
-      variant="outlined"
-      sx={{
-        bgcolor: color ? currentThemeColors[color as INoteColors] : "inherit",
-        "&:hover": { boxShadow: (theme) => theme.shadows[4] }
-      }}
-      onClick={(event) => onClickCard(event, note)}
-    >
-      <CardContent>
-        <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1}>
-          <Typography variant="h6">{title}</Typography>
-          <Box>
-            <Tooltip title={isPinned ? "Unpin note" : "Pin note"}>
-              <IconButton size="small" onClick={(event) => onClickPinNote(event, note)}>
-                {isPinned ? (
-                  <PushPinIcon fontSize="small" color="primary" sx={{ transform: "rotate(45deg)" }} />
-                ) : (
-                  <PushPinOutlinedIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
+    <Fragment>
+      <Card
+        variant="outlined"
+        sx={{
+          bgcolor: color ? currentThemeColors[color as INoteColors] : "inherit",
+          "&:hover": { boxShadow: (theme) => theme.shadows[4] }
+        }}
+        onClick={(event) => onClickCard(event, note)}
+      >
+        <CardContent>
+          <Box display="flex" flexDirection="row" justifyContent="space-between" gap={1}>
+            <Typography variant="h6">{title}</Typography>
+            <Box>
+              <Tooltip title={isPinned ? "Unpin note" : "Pin note"}>
+                <IconButton size="small" onClick={(event) => onClickPinNote(event, note)}>
+                  {isPinned ? (
+                    <PushPinIcon fontSize="small" color="primary" sx={{ transform: "rotate(45deg)" }} />
+                  ) : (
+                    <PushPinOutlinedIcon fontSize="small" />
+                  )}
+                </IconButton>
+              </Tooltip>
+            </Box>
           </Box>
-        </Box>
 
-        <Typography whiteSpace="pre-wrap" variant="body2" mt={1}>
-          {description}
-        </Typography>
+          <Typography whiteSpace="pre-wrap" variant="body2" mt={1}>
+            {description}
+          </Typography>
 
-        {Array.isArray(tasks) && tasks.length ? (
-          <List disablePadding>
-            {bucketItems.map((taskItem) => {
-              const { title, checked, order } = taskItem;
-              return (
-                <ListItem key={order} disablePadding>
-                  <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
-                    <IconButton size="small" tabIndex={-1} aria-hidden="true">
-                      {checked ? (
-                        <CheckBoxOutlinedIcon fontSize="small" />
-                      ) : (
-                        <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
-                      )}
-                    </IconButton>
+          {Array.isArray(tasks) && tasks.length ? (
+            <List disablePadding>
+              {bucketItems.map((taskItem) => {
+                const { title, checked, order } = taskItem;
+                return (
+                  <ListItem key={order} disablePadding>
+                    <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
+                      <IconButton size="small" tabIndex={-1} aria-hidden="true">
+                        {checked ? (
+                          <CheckBoxOutlinedIcon fontSize="small" />
+                        ) : (
+                          <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+                        )}
+                      </IconButton>
 
-                    <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
-                  </Box>
-                </ListItem>
-              );
-            })}
+                      <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
+                    </Box>
+                  </ListItem>
+                );
+              })}
 
-            {completedItems.map((taskItem) => {
-              const { title, checked, order } = taskItem;
-              return (
-                <ListItem key={order} disablePadding>
-                  <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
-                    <IconButton size="small" tabIndex={-1} aria-hidden="true">
-                      {checked ? (
-                        <CheckBoxOutlinedIcon fontSize="small" />
-                      ) : (
-                        <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
-                      )}
-                    </IconButton>
+              {completedItems.map((taskItem) => {
+                const { title, checked, order } = taskItem;
+                return (
+                  <ListItem key={order} disablePadding>
+                    <Box width="100%" display="flex" alignItems="center" justifyContent="space-between">
+                      <IconButton size="small" tabIndex={-1} aria-hidden="true">
+                        {checked ? (
+                          <CheckBoxOutlinedIcon fontSize="small" />
+                        ) : (
+                          <CheckBoxOutlineBlankOutlinedIcon fontSize="small" />
+                        )}
+                      </IconButton>
 
-                    <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
-                  </Box>
-                </ListItem>
-              );
-            })}
-          </List>
-        ) : null}
+                      <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
+                    </Box>
+                  </ListItem>
+                );
+              })}
+            </List>
+          ) : null}
 
-        <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1} mt={1}>
-          {labels?.map((label) => (
-            <Chip
-              key={label}
-              label={label}
-              size="small"
-              color="default"
-              variant="outlined"
-              onDelete={(event) => onClickRemoveLabel(event, note, label)}
-            />
+          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1} mt={2}>
+            {labels?.map((labelId) => (
+              <Chip
+                key={labelId}
+                label={labelIdAndNameMapping[labelId]}
+                size="small"
+                color="default"
+                variant="outlined"
+                onDelete={(event) => handleClickRemoveLabel(event, labelId)}
+              />
+            ))}
+          </Box>
+        </CardContent>
+
+        <CardActions>
+          {actionButtons.map(({ title, Icon, onClick }) => (
+            <Fragment key={title}>
+              <Tooltip title={title}>
+                <IconButton size="small" onClick={(event) => onClick(event, note)}>
+                  {Icon}
+                </IconButton>
+              </Tooltip>
+            </Fragment>
           ))}
-        </Box>
-      </CardContent>
 
-      <CardActions>
-        {actionButtons.map(({ title, Icon, onClick }) => (
-          <Fragment key={title}>
-            <Tooltip title={title}>
-              <IconButton size="small" onClick={(event) => onClick(event, note)}>
-                {Icon}
-              </IconButton>
-            </Tooltip>
-          </Fragment>
-        ))}
+          <Tooltip title="More">
+            <IconButton id="more" size="small" ref={moreButtonRef} onClick={(event) => handleClickMore(event, note)}>
+              <MoreVertOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </CardActions>
+      </Card>
 
-        <Tooltip title="More">
-          <IconButton
-            id="more"
-            size="small"
-            onClick={(event) => {
-              event.stopPropagation();
-              setMoreAnchorEle((prev) => (prev ? null : event.currentTarget));
-              setOpenMoreMenu((prev) => !prev);
-            }}
-          >
-            <MoreVertOutlinedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+      <ColorPickerPopover
+        open={openColorPopover}
+        anchorEl={anchorElColorPopover}
+        selectedColor={note?.color}
+        onClose={handleClickBgOptions}
+        onUpdate={(colorKey: string) => onClickBgOptions(colorKey, note)}
+      />
 
-        <Menu
-          id="more-menu"
-          open={openMoreMenu}
-          anchorEl={moreAnchorEle}
-          onClose={(event: any) => {
-            event?.stopPropagation();
-            setMoreAnchorEle(null);
-            setOpenMoreMenu(false);
-          }}
-          MenuListProps={{ "aria-labelledby": "more" }}
-        >
-          {moreActionOptions.map(({ title, Icon, onClick }) => (
-            <MenuItem
-              key={title}
-              onClick={(event) => {
-                event?.stopPropagation();
-                setMoreAnchorEle(null);
-                setOpenMoreMenu(false);
-                onClick(event, note);
-              }}
-            >
-              <ListItemIcon>{Icon}</ListItemIcon>
-              <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
-            </MenuItem>
-          ))}
-        </Menu>
+      <MorePopover
+        open={openMorePopover}
+        anchorEl={anchorElMorePopover}
+        onClose={handleClickMore}
+        onClickOption={handleClickMoreOption}
+      />
 
-        <ColorPickerPopover
-          open={openPopover}
-          anchorEl={anchorEl}
-          selectedColor={note?.color}
-          onClose={handleClickBgOptions}
-          onUpdate={(colorKey: string) => onClickBgOptions(colorKey, note)}
-        />
-      </CardActions>
-    </Card>
+      <LabelPopover
+        open={openLabelPopover}
+        anchorEl={anchorElLabelPopover}
+        selectedLabels={note.labels}
+        onClose={handleClickAddLabel}
+        onClickOption={handleClickLabelOption}
+      />
+    </Fragment>
   );
 };
 

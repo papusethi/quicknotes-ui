@@ -1,32 +1,64 @@
-import { Box, Popover, Typography } from "@mui/material";
+import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
+import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
 import React from "react";
+import { useAppSelector } from "../../redux/hooks";
 
 interface ILabelPopoverProps {
   open: boolean;
   anchorEl: Element | null;
   selectedLabels?: string[] | null;
-  onUpdate: Function;
   onClose: Function;
+  onClickOption: Function;
 }
 
 const LabelPopover: React.FC<ILabelPopoverProps> = (props) => {
-  const { open, anchorEl, selectedLabels, onUpdate, onClose } = props;
+  const { open, anchorEl, selectedLabels, onClose, onClickOption } = props;
+
+  const userLabels = useAppSelector((state) => state.user.userLabels);
 
   return (
-    <Popover
+    <Menu
+      id="more-menu"
       open={open}
       anchorEl={anchorEl}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      transformOrigin={{ vertical: "top", horizontal: "center" }}
       onClose={(event: any) => {
         event?.stopPropagation();
         onClose();
       }}
+      MenuListProps={{ "aria-labelledby": "Add label" }}
     >
-      <Box p={1} display="flex" gap={1} onClick={(event) => event.stopPropagation()}>
-        <Typography>Label note</Typography>
-      </Box>
-    </Popover>
+      {userLabels.map(({ _id, name }, index) => (
+        <MenuItem
+          key={_id}
+          divider={userLabels.length === index + 1}
+          onClick={(event) => {
+            event?.stopPropagation();
+            onClickOption(event, _id);
+          }}
+        >
+          {
+            <ListItemIcon>
+              {_id && selectedLabels?.includes(_id) ? <CheckOutlinedIcon fontSize="small" /> : null}
+            </ListItemIcon>
+          }
+          <ListItemText primaryTypographyProps={{ variant: "body2" }}>{name}</ListItemText>
+        </MenuItem>
+      ))}
+
+      <MenuItem
+        key="manage-labels"
+        onClick={(event) => {
+          event?.stopPropagation();
+          onClose();
+        }}
+      >
+        <ListItemIcon>
+          <StyleOutlinedIcon fontSize="small" />
+        </ListItemIcon>
+        <ListItemText primaryTypographyProps={{ variant: "body2" }}>Manage labels</ListItemText>
+      </MenuItem>
+    </Menu>
   );
 };
 

@@ -1,16 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { INote } from "../pages/Dashboard";
+import { ILabelItem, INote } from "../pages/Dashboard";
 
 export interface UserState {
   currentUser: null | Record<string, string>;
   userPreferences: null | Record<string, string>;
   userNotes: INote[];
+  userLabels: ILabelItem[];
 }
 
 const initialState: UserState = {
   currentUser: null,
   userPreferences: null,
-  userNotes: []
+  userNotes: [],
+  userLabels: []
 };
 
 export const userSlice = createSlice({
@@ -26,10 +28,13 @@ export const userSlice = createSlice({
     },
     setUserNotes: (state, action) => {
       state.userNotes = action.payload || [];
+    },
+    setUserLabels: (state, action) => {
+      state.userLabels = action.payload || [];
     }
   }
 });
 
-export const { setCurrentUser, setUserPreferences, setUserNotes } = userSlice.actions;
+export const { setCurrentUser, setUserPreferences, setUserNotes, setUserLabels } = userSlice.actions;
 
 export default userSlice.reducer;

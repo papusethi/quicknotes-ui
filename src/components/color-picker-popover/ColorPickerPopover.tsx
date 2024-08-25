@@ -29,7 +29,7 @@ const ColorPickerPopover: React.FC<IColorPickerPopoverProps> = (props) => {
         onClose();
       }}
     >
-      <Box p={1} display="flex" gap={1} onClick={(event) => event.stopPropagation()}>
+      <Box p={1} display="flex" gap={1}>
         {Object.entries(currentThemeColors).map((entry) => {
           const [colorKey, colorValue] = entry;
           return (
