@@ -161,7 +161,7 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
           <Tooltip title={noteData?.isPinned ? "Pinned" : "Unpinned"}>
             <IconButton size="small" onClick={handleClickNotePinned}>
               {noteData?.isPinned ? (
-                <PushPinIcon fontSize="small" color="primary" sx={{ transform: "rotate(45deg)" }} />
+                <PushPinIcon fontSize="small" sx={{ transform: "rotate(45deg)" }} />
               ) : (
                 <PushPinOutlinedIcon fontSize="small" />
               )}

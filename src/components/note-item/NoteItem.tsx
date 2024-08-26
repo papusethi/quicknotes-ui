@@ -188,7 +188,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
               <Tooltip title={isPinned ? "Unpin note" : "Pin note"}>
                 <IconButton size="small" onClick={(event) => onClickPinNote(event, note)}>
                   {isPinned ? (
-                    <PushPinIcon fontSize="small" color="primary" sx={{ transform: "rotate(45deg)" }} />
+                    <PushPinIcon fontSize="small" sx={{ transform: "rotate(45deg)" }} />
                   ) : (
                     <PushPinOutlinedIcon fontSize="small" />
                   )}

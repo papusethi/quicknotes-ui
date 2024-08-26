@@ -1,9 +1,8 @@
-import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
-import React from "react";
-
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
+import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
+import React from "react";
 
 interface IMorePopoverProps {
   open: boolean;
@@ -48,7 +47,7 @@ const MorePopover: React.FC<IMorePopoverProps> = (props) => {
       MenuListProps={{ "aria-labelledby": "more" }}
     >
       {moreActionOptions.map(({ id, title, Icon, onClick }) => (
-        <MenuItem key={id} onClick={(event) => onClickOption(event, id)}>
+        <MenuItem key={id} onClick={(event) => onClick(event, id)}>
           <ListItemIcon>{Icon}</ListItemIcon>
           <ListItemText primaryTypographyProps={{ variant: "body2" }}>{title}</ListItemText>
         </MenuItem>
