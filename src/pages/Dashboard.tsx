@@ -1,5 +1,7 @@
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import LabelIcon from "@mui/icons-material/Label";
+import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
@@ -45,6 +47,7 @@ const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const userNotes = useAppSelector((state) => state.user.userNotes);
+  const userLabels = useAppSelector((state) => state.user.userLabels);
 
   const [selectedId, setSelectedId] = useState("notes");
   const [openEditNote, setOpenEditNote] = useState(false);
@@ -122,7 +125,7 @@ const Dashboard: React.FC = () => {
   };
 
   const handleClickBgOptions = async (colorKey: string | null, note: INote) => {
-    const updateNote = { ...note, color: colorKey };
+    const updateNote = { ...note, color: note.color === colorKey ? null : colorKey };
     try {
       const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
       dispatch(setUserNotes(data?.data));
@@ -171,6 +174,33 @@ const Dashboard: React.FC = () => {
     }
   });
 
+  // list items generated from labels.
+  const listItemsFromLabels = userLabels.map(({ _id, name }) => ({
+    id: name,
+    text: name,
+    Icon: LabelOutlinedIcon,
+    ActiveIcon: LabelIcon,
+    content: (
+      <Box>
+        <NoteList
+          notes={userNotes?.filter(({ labels }) => labels && _id && labels.includes(_id))}
+          emptyState={{
+            Icon: <LocalOfferOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+            title: `Notes with ${name} label appear here`
+          }}
+          onClickPinNote={handleClickPinNote}
+          onClickDeleteNote={handleClickDeleteNote}
+          onClickRemindMe={handleClickRemindMe}
+          onClickBgOptions={handleClickBgOptions}
+          onClickArchive={handleClickArchive}
+          onClickUpdateLabel={handleClickUpdateLabel}
+          onClickCard={handleClickCard}
+          onClickMakeCopy={handleClickMakeCopy}
+        />
+      </Box>
+    )
+  }));
+
   const listConfig = [
     {
       id: "notes",
@@ -205,6 +235,9 @@ const Dashboard: React.FC = () => {
       ActiveIcon: NotificationsIcon,
       content: null
     },
+
+    ...listItemsFromLabels,
+
     {
       id: "manageLabels",
       text: "Manage labels",
