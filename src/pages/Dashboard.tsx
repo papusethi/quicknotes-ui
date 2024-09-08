@@ -39,6 +39,7 @@ export interface INote {
   isPinned: boolean;
   isArchived: boolean;
   color: null | string;
+  dueDateTime: null | Date;
   type: "NOTE" | "CHECKLIST";
   tasks: null | ITaskItem[];
 }
@@ -52,6 +53,8 @@ const Dashboard: React.FC = () => {
   const [selectedId, setSelectedId] = useState("notes");
   const [openEditNote, setOpenEditNote] = useState(false);
   const [currentNote, setCurrentNote] = useState<null | INote>(null);
+
+  const [completedTasks, setCompletedTasks] = useState(new Set());
 
   useEffect(() => {
     const fetchAllNotes = async () => {
@@ -75,6 +78,25 @@ const Dashboard: React.FC = () => {
     fetchAllNotes();
     fetchAllLabels();
   }, [dispatch]);
+
+  useEffect(() => {
+    const reminders = userNotes.map((note) => {
+      const timeDiff = note?.dueDateTime ? new Date(note?.dueDateTime)?.getTime() - Date.now() : 0;
+      if (note?._id && timeDiff > 0 && !completedTasks.has(note?._id)) {
+        return setTimeout(() => {
+          alert(`Reminder: ${note.title || "One note"} is due in 1 minute.`);
+          setCompletedTasks((prevCompletedTasks) => new Set(prevCompletedTasks).add(note?._id));
+        }, timeDiff - 60000);
+      }
+      return null;
+    });
+
+    return () => {
+      reminders.forEach((reminder) => {
+        if (reminder) clearTimeout(reminder);
+      });
+    };
+  }, [completedTasks, userNotes]);
 
   const handleClickListItem = (newTabId: string) => {
     setSelectedId(newTabId);
@@ -119,9 +141,14 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const handleClickRemindMe = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-    console.log("remind me clicked");
+  const handleClickRemindMe = async (dueDateTime: Date | null, note: INote) => {
+    const updateNote = { ...note, dueDateTime };
+    try {
+      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      dispatch(setUserNotes(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
   };
 
   const handleClickBgOptions = async (colorKey: string | null, note: INote) => {

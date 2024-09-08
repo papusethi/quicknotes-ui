@@ -36,6 +36,7 @@ export const newNoteInitData: INote = {
   isPinned: false,
   isArchived: false,
   color: null,
+  dueDateTime: null,
   type: "NOTE",
   tasks: null
 };

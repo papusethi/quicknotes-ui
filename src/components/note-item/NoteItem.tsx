@@ -27,6 +27,7 @@ import { DARK_THEME_COLORS, INoteColors, LIGHT_THEME_COLORS } from "../color";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import LabelPopover from "../label-popover/LabelPopover";
 import MorePopover from "../more-popover/MorePopover";
+import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 
 interface INoteItemProps {
   note: INote;
@@ -69,6 +70,9 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   const [openLabelPopover, setOpenLabelPopover] = useState(false);
   const [anchorElLabelPopover, setAnchorElLabelPopover] = useState<null | Element>(null);
 
+  const [openDatetimePopover, setOpenDatetimePopover] = useState(false);
+  const [anchorElDatetimePopover, setAnchorElDatetimePopover] = useState<null | Element>(null);
+
   const moreButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // User label id and label name mapping for easier to display in note.
@@ -80,6 +84,12 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
       return acc;
     }, {} as Record<string, string>);
   }, [userLabels]);
+
+  const handleClickRemindMe = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    setOpenDatetimePopover((prev) => !prev);
+    setAnchorElDatetimePopover(anchorElDatetimePopover ? null : event.currentTarget);
+  };
 
   const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
     event?.stopPropagation();
@@ -162,7 +172,7 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   });
 
   const actionButtons = [
-    { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: onClickRemindMe },
+    { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: handleClickRemindMe },
     { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
     {
       title: isArchived ? "Unarchive" : "Archive",
@@ -275,6 +285,14 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
           </Tooltip>
         </CardActions>
       </Card>
+
+      <DatetimePickerPopover
+        open={openDatetimePopover}
+        anchorEl={anchorElDatetimePopover}
+        dueDateTime={null}
+        onClose={handleClickRemindMe}
+        onUpdate={(dueDateTime: Date | null) => onClickRemindMe(dueDateTime, note)}
+      />
 
       <ColorPickerPopover
         open={openColorPopover}
