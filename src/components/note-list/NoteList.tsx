@@ -15,6 +15,7 @@ interface INoteListProps {
   onClickUpdateLabel: Function;
   onClickDeleteNote: Function;
   onClickRemindMe: Function;
+  onClickRemoveReminder: Function;
   onClickBgOptions: Function;
   onClickArchive: Function;
   onClickCard: Function;
@@ -29,6 +30,7 @@ const NoteList: React.FC<INoteListProps> = (props) => {
     onClickUpdateLabel,
     onClickDeleteNote,
     onClickRemindMe,
+    onClickRemoveReminder,
     onClickBgOptions,
     onClickArchive,
     onClickCard,
@@ -54,6 +56,7 @@ const NoteList: React.FC<INoteListProps> = (props) => {
                 onClickPinNote={onClickPinNote}
                 onClickDeleteNote={onClickDeleteNote}
                 onClickRemindMe={onClickRemindMe}
+                onClickRemoveReminder={onClickRemoveReminder}
                 onClickBgOptions={onClickBgOptions}
                 onClickArchive={onClickArchive}
                 onClickUpdateLabel={onClickUpdateLabel}

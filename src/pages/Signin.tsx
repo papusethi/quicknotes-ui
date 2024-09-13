@@ -48,7 +48,7 @@ const Signin: React.FC = () => {
           <Box textAlign="center">
             <StyledLink to="/#">
               <Typography variant="h4" display="inline-block">
-                QuikNotes.
+                QuikNotes
               </Typography>
             </StyledLink>
             <Typography variant="body2" textAlign="center">

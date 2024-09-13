@@ -35,6 +35,7 @@ interface INoteItemProps {
   onClickUpdateLabel: Function;
   onClickDeleteNote: Function;
   onClickRemindMe: Function;
+  onClickRemoveReminder: Function;
   onClickBgOptions: Function;
   onClickArchive: Function;
   onClickCard: Function;
@@ -48,13 +49,14 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     onClickUpdateLabel,
     onClickDeleteNote,
     onClickRemindMe,
+    onClickRemoveReminder,
     onClickBgOptions,
     onClickArchive,
     onClickCard,
     onClickMakeCopy
   } = props;
 
-  const { title, description, labels, isPinned, isArchived, color, tasks } = note;
+  const { title, description, labels, isPinned, isArchived, color, tasks, dueDateTime } = note;
 
   const appTheme = useAppSelector((state) => state.app.theme);
   const currentThemeColors = appTheme === "dark" ? DARK_THEME_COLORS : LIGHT_THEME_COLORS;
@@ -265,6 +267,19 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
               />
             ))}
           </Box>
+
+          {dueDateTime && (
+            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1} mt={2}>
+              <Chip
+                key="dueDateTime"
+                label={dueDateTime?.toString()}
+                size="small"
+                color="default"
+                variant="outlined"
+                onDelete={(event) => onClickRemoveReminder(event, note)}
+              />
+            </Box>
+          )}
         </CardContent>
 
         <CardActions>

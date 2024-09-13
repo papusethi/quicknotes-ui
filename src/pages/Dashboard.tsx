@@ -151,6 +151,17 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleClickRemoveReminder = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
+    event?.stopPropagation();
+    const updateNote = { ...note, dueDateTime: null };
+    try {
+      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
+      dispatch(setUserNotes(data?.data));
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
   const handleClickBgOptions = async (colorKey: string | null, note: INote) => {
     const updateNote = { ...note, color: note.color === colorKey ? null : colorKey };
     try {
@@ -192,12 +203,17 @@ const Dashboard: React.FC = () => {
 
   const unarchivedNotes: INote[] = [];
   const archivedNotes: INote[] = [];
+  const upcomingReminderNotes: INote[] = [];
 
   userNotes?.forEach((note) => {
     if (note.isArchived) {
       archivedNotes.push(note);
     } else {
       unarchivedNotes.push(note);
+    }
+
+    if (note.dueDateTime) {
+      upcomingReminderNotes.push(note);
     }
   });
 
@@ -218,6 +234,7 @@ const Dashboard: React.FC = () => {
           onClickPinNote={handleClickPinNote}
           onClickDeleteNote={handleClickDeleteNote}
           onClickRemindMe={handleClickRemindMe}
+          onClickRemoveReminder={handleClickRemoveReminder}
           onClickBgOptions={handleClickBgOptions}
           onClickArchive={handleClickArchive}
           onClickUpdateLabel={handleClickUpdateLabel}
@@ -246,6 +263,7 @@ const Dashboard: React.FC = () => {
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
             onClickRemindMe={handleClickRemindMe}
+            onClickRemoveReminder={handleClickRemoveReminder}
             onClickBgOptions={handleClickBgOptions}
             onClickArchive={handleClickArchive}
             onClickUpdateLabel={handleClickUpdateLabel}
@@ -260,7 +278,26 @@ const Dashboard: React.FC = () => {
       text: "Reminders",
       Icon: NotificationsOutlinedIcon,
       ActiveIcon: NotificationsIcon,
-      content: null
+      content: (
+        <Box>
+          <NoteList
+            notes={upcomingReminderNotes}
+            emptyState={{
+              Icon: <NotificationsOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+              title: "Notes with upcoming reminders appear here"
+            }}
+            onClickPinNote={handleClickPinNote}
+            onClickDeleteNote={handleClickDeleteNote}
+            onClickRemindMe={handleClickRemindMe}
+            onClickRemoveReminder={handleClickRemoveReminder}
+            onClickBgOptions={handleClickBgOptions}
+            onClickArchive={handleClickArchive}
+            onClickUpdateLabel={handleClickUpdateLabel}
+            onClickCard={handleClickCard}
+            onClickMakeCopy={handleClickMakeCopy}
+          />
+        </Box>
+      )
     },
 
     ...listItemsFromLabels,
@@ -295,6 +332,7 @@ const Dashboard: React.FC = () => {
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
             onClickRemindMe={handleClickRemindMe}
+            onClickRemoveReminder={handleClickRemoveReminder}
             onClickBgOptions={handleClickBgOptions}
             onClickArchive={handleClickArchive}
             onClickUpdateLabel={handleClickUpdateLabel}

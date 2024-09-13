@@ -44,7 +44,7 @@ const Home: React.FC = () => {
       <Box py={2} display="flex" flexDirection="row" justifyContent="space-between" alignItems="center" gap={4}>
         <Box>
           <StyledLink to="/#">
-            <Typography variant="h5">QuikNotes.</Typography>
+            <Typography variant="h5">QuikNotes</Typography>
           </StyledLink>
         </Box>
 
@@ -342,7 +342,7 @@ const Home: React.FC = () => {
             <Box>
               <StyledLink to="/#">
                 <Typography variant="h4" display="inline-block">
-                  QuikNotes.
+                  QuikNotes
                 </Typography>
               </StyledLink>
 
