@@ -27,6 +27,7 @@ import { setUserNotes } from "../../redux/userSlice";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
+import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import LabelPopover from "../label-popover/LabelPopover";
 
 export const newNoteInitData: INote = {
@@ -57,6 +58,9 @@ const CreateNote: React.FC = () => {
 
   const [openLabelPopover, setOpenLabelPopover] = useState(false);
   const [anchorElLabelPopover, setAnchorElLabelPopover] = useState<null | Element>(null);
+
+  const [openDatetimePopover, setOpenDatetimePopover] = useState(false);
+  const [anchorElDatetimePopover, setAnchorElDatetimePopover] = useState<null | Element>(null);
 
   // User label id and label name mapping for easier to display in note.
   const labelIdAndNameMapping = useMemo(() => {
@@ -114,9 +118,29 @@ const CreateNote: React.FC = () => {
     setNoteData(updateNote);
   };
 
-  const handleClickRemindMe = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleClickRemindMe = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
-    console.log("remind me clicked");
+    setOpenDatetimePopover((prev) => !prev);
+    setAnchorElDatetimePopover(anchorElDatetimePopover ? null : event.currentTarget);
+  };
+
+  const handleUpdateReminder = (dueDateTime: Date | null) => {
+    if (!noteData) {
+      return;
+    }
+
+    const updateNote = { ...noteData, dueDateTime: dueDateTime };
+    setNoteData(updateNote);
+  };
+
+  const handleClickRemoveReminder = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.stopPropagation();
+    if (!noteData) {
+      return;
+    }
+
+    const updateNote = { ...noteData, dueDateTime: null };
+    setNoteData(updateNote);
   };
 
   const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -263,6 +287,19 @@ const CreateNote: React.FC = () => {
                   ))}
                 </Box>
               ) : null}
+
+              {noteData?.dueDateTime && (
+                <Box display="flex" flexDirection="row" flexWrap="wrap" gap={1} mt={2}>
+                  <Chip
+                    key="dueDateTime"
+                    label={noteData?.dueDateTime?.toString()}
+                    size="small"
+                    color="default"
+                    variant="outlined"
+                    onDelete={(event) => handleClickRemoveReminder(event)}
+                  />
+                </Box>
+              )}
             </CardContent>
 
             <CardActions>
@@ -275,6 +312,14 @@ const CreateNote: React.FC = () => {
                   </Tooltip>
                 </Fragment>
               ))}
+
+              <DatetimePickerPopover
+                open={openDatetimePopover}
+                anchorEl={anchorElDatetimePopover}
+                dueDateTime={null}
+                onClose={handleClickRemindMe}
+                onUpdate={(dueDateTime: Date | null) => handleUpdateReminder(dueDateTime)}
+              />
 
               <ColorPickerPopover
                 open={openColorPopover}
