@@ -1,5 +1,7 @@
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import FolderIcon from "@mui/icons-material/Folder";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
 import LightbulbIcon from "@mui/icons-material/Lightbulb";
@@ -13,15 +15,23 @@ import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
 import CreateNote from "../components/create-note/CreateNote";
 import EditNote from "../components/edit-note/EditNote";
+import FolderList from "../components/folder-list/FolderList";
 import Header from "../components/header/Header";
 import LabelList from "../components/label-list/LabelList";
 import NoteList from "../components/note-list/NoteList";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { setUserLabels, setUserNotes } from "../redux/userSlice";
+import { setUserFolders, setUserLabels, setUserNotes } from "../redux/userSlice";
+
+export interface IFolderItem {
+  readonly _id?: string;
+  userId: string;
+  name: string;
+}
 
 export interface ILabelItem {
   readonly _id?: string;
+  userId: string;
   name: string;
 }
 
@@ -75,8 +85,18 @@ const Dashboard: React.FC = () => {
       }
     };
 
+    const fetchAllFolders = async () => {
+      try {
+        const { data } = await axiosInstance.get("/folder");
+        dispatch(setUserFolders(data?.data));
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
     fetchAllNotes();
     fetchAllLabels();
+    fetchAllFolders();
   }, [dispatch]);
 
   useEffect(() => {
@@ -312,6 +332,20 @@ const Dashboard: React.FC = () => {
           <Typography variant="h6">Manage labels</Typography>
           <Box mt={2}>
             <LabelList />
+          </Box>
+        </Box>
+      )
+    },
+    {
+      id: "manageFolders",
+      text: "Manage folders",
+      Icon: FolderOutlinedIcon,
+      ActiveIcon: FolderIcon,
+      content: (
+        <Box>
+          <Typography variant="h6">Manage folders</Typography>
+          <Box mt={2}>
+            <FolderList />
           </Box>
         </Box>
       )

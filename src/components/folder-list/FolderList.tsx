@@ -17,48 +17,48 @@ import {
 } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
-import { ILabelItem } from "../../pages/Dashboard";
+import { IFolderItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { setUserLabels } from "../../redux/userSlice";
+import { setUserFolders } from "../../redux/userSlice";
 
-interface ILabelItemProps {
-  labelItem: ILabelItem;
+interface IFolderItemProps {
+  folderItem: IFolderItem;
   onUpdate: Function;
   onClickDelete: Function;
 }
 
-const LabelItem: React.FC<ILabelItemProps> = (props) => {
-  const { labelItem, onUpdate, onClickDelete } = props;
+const FolderItem: React.FC<IFolderItemProps> = (props) => {
+  const { folderItem, onUpdate, onClickDelete } = props;
 
   const [editMode, setEditMode] = useState(false);
-  const [newLabelName, setNewLabelName] = useState(labelItem.name);
+  const [newFolderName, setNewFolderName] = useState(folderItem.name);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setNewLabelName(event.target.value);
+    setNewFolderName(event.target.value);
   };
 
   const handleClickEdit = () => {
     setEditMode(true);
-    setNewLabelName(labelItem.name);
+    setNewFolderName(folderItem.name);
   };
 
-  const updateLabelItem = () => {
+  const updateFolderItem = () => {
     setEditMode(false);
 
-    if (labelItem.name !== newLabelName.trim()) {
-      const updatedLabelItem = { ...labelItem, name: newLabelName };
-      onUpdate(updatedLabelItem);
+    if (folderItem.name !== newFolderName.trim()) {
+      const updatedFolderItem = { ...folderItem, name: newFolderName };
+      onUpdate(updatedFolderItem);
     }
   };
 
   const handleClickSave = () => {
-    updateLabelItem();
+    updateFolderItem();
   };
 
   const handleKeyUp = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter") {
-      updateLabelItem();
+      updateFolderItem();
     }
   };
 
@@ -69,12 +69,12 @@ const LabelItem: React.FC<ILabelItemProps> = (props) => {
           fullWidth
           autoFocus
           variant="standard"
-          value={newLabelName}
+          value={newFolderName}
           onChange={handleChange}
           onKeyUp={handleKeyUp}
         />
       ) : (
-        <ListItemText>{labelItem.name}</ListItemText>
+        <ListItemText>{folderItem.name}</ListItemText>
       )}
 
       <ListItemSecondaryAction>
@@ -93,7 +93,7 @@ const LabelItem: React.FC<ILabelItemProps> = (props) => {
         )}
 
         <Tooltip title="Delete">
-          <IconButton size="small" onClick={(event) => onClickDelete(event, labelItem)}>
+          <IconButton size="small" onClick={(event) => onClickDelete(event, folderItem)}>
             <DeleteForeverOutlinedIcon fontSize="small" />
           </IconButton>
         </Tooltip>
@@ -102,22 +102,21 @@ const LabelItem: React.FC<ILabelItemProps> = (props) => {
   );
 };
 
-const LabelList: React.FC = () => {
+const FolderList: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
-  const userLabels = useAppSelector((state) => state.user.userLabels);
+  const userFolders = useAppSelector((state) => state.user.userFolders);
 
-  const [newLabelName, setNewLabelName] = useState("");
+  const [newFolderName, setNewFolderName] = useState("");
 
   const addItemToList = async () => {
-    if (newLabelName.trim() && currentUser?._id) {
-      const newLabelItem: ILabelItem = { name: newLabelName, userId: currentUser?._id };
-
+    if (newFolderName.trim() && currentUser?._id) {
+      const newFolderItem: IFolderItem = { name: newFolderName?.trim(), userId: currentUser?._id };
       try {
-        const { data } = await axiosInstance.post("/label", JSON.stringify(newLabelItem));
-        dispatch(setUserLabels(data?.data));
-        setNewLabelName("");
+        const { data } = await axiosInstance.post("/folder", JSON.stringify(newFolderItem));
+        dispatch(setUserFolders(data?.data));
+        setNewFolderName("");
       } catch (error: any) {
         dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
       }
@@ -126,7 +125,7 @@ const LabelList: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setNewLabelName(value);
+    setNewFolderName(value);
   };
 
   const handleKeyUp = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -139,19 +138,22 @@ const LabelList: React.FC = () => {
     addItemToList();
   };
 
-  const handleClickUpdate = async (labelItem: ILabelItem) => {
+  const handleClickUpdate = async (folderItem: IFolderItem) => {
     try {
-      const { data } = await axiosInstance.put(`/label/${labelItem._id}`, JSON.stringify(labelItem));
-      dispatch(setUserLabels(data?.data));
+      const { data } = await axiosInstance.put(`/folder/${folderItem._id}`, JSON.stringify(folderItem));
+      dispatch(setUserFolders(data?.data));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
   };
 
-  const handleClickDelete = async (_event: React.MouseEvent<HTMLButtonElement, MouseEvent>, labelItem: ILabelItem) => {
+  const handleClickDelete = async (
+    _event: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    folderItem: IFolderItem
+  ) => {
     try {
-      const { data } = await axiosInstance.delete(`/label/${labelItem._id}`);
-      dispatch(setUserLabels(data?.data));
+      const { data } = await axiosInstance.delete(`/folder/${folderItem._id}`);
+      dispatch(setUserFolders(data?.data));
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
@@ -167,17 +169,17 @@ const LabelList: React.FC = () => {
               autoFocus
               size="small"
               variant="standard"
-              placeholder="Enter label name"
+              placeholder="Enter folder name"
               InputProps={{
                 disableUnderline: true,
                 startAdornment: <LocalOfferOutlinedIcon color="action" sx={{ mr: 0.5 }} />
               }}
-              value={newLabelName}
+              value={newFolderName}
               onChange={handleChange}
               onKeyUp={handleKeyUp}
             />
 
-            <Tooltip title="Add to list">
+            <Tooltip title="Add folder">
               <IconButton size="small" onClick={handleClickAddToList}>
                 <KeyboardReturnOutlinedIcon fontSize="small" />
               </IconButton>
@@ -189,13 +191,13 @@ const LabelList: React.FC = () => {
       <Divider sx={{ mt: 0.5 }} />
 
       <Box my={2}>
-        {Array.isArray(userLabels) && userLabels.length ? (
+        {Array.isArray(userFolders) && userFolders.length ? (
           <List disablePadding>
-            {userLabels.map((labelItem) => {
+            {userFolders.map((folderItem) => {
               return (
-                <LabelItem
-                  key={labelItem._id}
-                  labelItem={labelItem}
+                <FolderItem
+                  key={folderItem._id}
+                  folderItem={folderItem}
                   onUpdate={handleClickUpdate}
                   onClickDelete={handleClickDelete}
                 />
@@ -203,11 +205,11 @@ const LabelList: React.FC = () => {
             })}
           </List>
         ) : (
-          <Typography>No labels found!</Typography>
+          <Typography>No folders found!</Typography>
         )}
       </Box>
     </Fragment>
   );
 };
 
-export default LabelList;
+export default FolderList;

@@ -1,18 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ILabelItem, INote } from "../pages/Dashboard";
+import { IFolderItem, ILabelItem, INote } from "../pages/Dashboard";
 
 export interface UserState {
   currentUser: null | Record<string, string>;
   userPreferences: null | Record<string, string>;
   userNotes: INote[];
   userLabels: ILabelItem[];
+  userFolders: IFolderItem[];
 }
 
 const initialState: UserState = {
   currentUser: null,
   userPreferences: null,
   userNotes: [],
-  userLabels: []
+  userLabels: [],
+  userFolders: []
 };
 
 export const userSlice = createSlice({
@@ -31,10 +33,13 @@ export const userSlice = createSlice({
     },
     setUserLabels: (state, action) => {
       state.userLabels = action.payload || [];
+    },
+    setUserFolders: (state, action) => {
+      state.userFolders = action.payload || [];
     }
   }
 });
 
-export const { setCurrentUser, setUserPreferences, setUserNotes, setUserLabels } = userSlice.actions;
+export const { setCurrentUser, setUserPreferences, setUserNotes, setUserLabels, setUserFolders } = userSlice.actions;
 
 export default userSlice.reducer;
