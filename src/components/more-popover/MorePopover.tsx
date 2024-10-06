@@ -1,5 +1,6 @@
 import ContentCopyOutlinedIcon from "@mui/icons-material/ContentCopyOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
 import React from "react";
@@ -19,6 +20,12 @@ const MorePopover: React.FC<IMorePopoverProps> = (props) => {
       id: "add-label",
       title: "Add label",
       Icon: <LocalOfferOutlinedIcon fontSize="small" />,
+      onClick: onClickOption
+    },
+    {
+      id: "move-to-folder",
+      title: "Move to folder",
+      Icon: <FolderOutlinedIcon fontSize="small" />,
       onClick: onClickOption
     },
     {

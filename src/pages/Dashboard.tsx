@@ -52,6 +52,7 @@ export interface INote {
   dueDateTime: null | Date;
   type: "NOTE" | "CHECKLIST";
   tasks: null | ITaskItem[];
+  folderId: null | string;
 }
 
 const Dashboard: React.FC = () => {

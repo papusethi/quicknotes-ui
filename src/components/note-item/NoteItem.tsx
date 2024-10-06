@@ -25,9 +25,10 @@ import { INote, ITaskItem } from "../../pages/Dashboard";
 import { useAppSelector } from "../../redux/hooks";
 import { DARK_THEME_COLORS, INoteColors, LIGHT_THEME_COLORS } from "../color";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
+import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
+import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
 import MorePopover from "../more-popover/MorePopover";
-import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 
 interface INoteItemProps {
   note: INote;
@@ -72,6 +73,9 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   const [openLabelPopover, setOpenLabelPopover] = useState(false);
   const [anchorElLabelPopover, setAnchorElLabelPopover] = useState<null | Element>(null);
 
+  const [openFolderPopover, setOpenFolderPopover] = useState(false);
+  const [anchorElFolderPopover, setAnchorElFolderPopover] = useState<null | Element>(null);
+
   const [openDatetimePopover, setOpenDatetimePopover] = useState(false);
   const [anchorElDatetimePopover, setAnchorElDatetimePopover] = useState<null | Element>(null);
 
@@ -105,6 +109,12 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     setAnchorElLabelPopover(anchorElLabelPopover ? null : moreButtonRef?.current);
   };
 
+  const handleClickMoveToFolder = (event: React.MouseEvent<HTMLLIElement, MouseEvent>) => {
+    event?.stopPropagation();
+    setOpenFolderPopover((prev) => !prev);
+    setAnchorElFolderPopover(anchorElFolderPopover ? null : moreButtonRef?.current);
+  };
+
   const handleClickMore = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
     event?.stopPropagation();
     setOpenMorePopover((prev) => !prev);
@@ -119,6 +129,10 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
     switch (optionId) {
       case "add-label": {
         handleClickAddLabel(event);
+        break;
+      }
+      case "move-to-folder": {
+        handleClickMoveToFolder(event);
         break;
       }
       case "make-copy": {
@@ -159,6 +173,14 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
 
     const updatedLabels = note?.labels?.filter((eachLabelId) => eachLabelId !== labelId);
     const updatedNote = { ...note, labels: updatedLabels ?? null };
+    onClickUpdateLabel(event, updatedNote);
+  };
+
+  const handleClickFolderOption = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, folderId: string) => {
+    event.stopPropagation();
+
+    // Move to new folder
+    const updatedNote = { ...note, folderId: folderId };
     onClickUpdateLabel(event, updatedNote);
   };
 
@@ -330,6 +352,14 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
         selectedLabels={note.labels}
         onClose={handleClickAddLabel}
         onClickOption={handleClickLabelOption}
+      />
+
+      <FolderPopover
+        open={openFolderPopover}
+        anchorEl={anchorElFolderPopover}
+        selectedFolderId={note.folderId}
+        onClose={handleClickMoveToFolder}
+        onClickOption={handleClickFolderOption}
       />
     </Fragment>
   );

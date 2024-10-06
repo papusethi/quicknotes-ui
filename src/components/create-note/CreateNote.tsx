@@ -39,7 +39,8 @@ export const newNoteInitData: INote = {
   color: null,
   dueDateTime: null,
   type: "NOTE",
-  tasks: null
+  tasks: null,
+  folderId: null
 };
 
 const CreateNote: React.FC = () => {
