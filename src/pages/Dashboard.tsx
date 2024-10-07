@@ -2,9 +2,10 @@ import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import HomeIcon from "@mui/icons-material/Home";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import LightbulbIcon from "@mui/icons-material/Lightbulb";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
@@ -60,8 +61,9 @@ const Dashboard: React.FC = () => {
 
   const userNotes = useAppSelector((state) => state.user.userNotes);
   const userLabels = useAppSelector((state) => state.user.userLabels);
+  const userFolders = useAppSelector((state) => state.user.userFolders);
 
-  const [selectedId, setSelectedId] = useState("notes");
+  const [selectedId, setSelectedId] = useState("home");
   const [openEditNote, setOpenEditNote] = useState(false);
   const [currentNote, setCurrentNote] = useState<null | INote>(null);
 
@@ -268,12 +270,44 @@ const Dashboard: React.FC = () => {
 
   const listConfig = [
     {
-      id: "notes",
-      text: "Notes",
-      Icon: LightbulbOutlinedIcon,
-      ActiveIcon: LightbulbIcon,
+      id: "home",
+      text: "Home",
+      Icon: HomeOutlinedIcon,
+      ActiveIcon: HomeIcon,
       content: (
         <Box>
+          <Box>
+            {Array.isArray(userFolders) && userFolders.length ? (
+              <Box>
+                <Typography fontWeight="bold">Recent folders</Typography>
+                <Box my={2} display="grid" gap={2} gridTemplateColumns="repeat(4, 1fr)">
+                  {userFolders.map(({ _id, name }) => (
+                    <Box
+                      key={_id}
+                      borderRadius={2}
+                      border="1px solid"
+                      borderColor="GrayText"
+                      paddingY={1}
+                      paddingX={2}
+                      display="flex"
+                      gap={2}
+                      alignItems="center"
+                    >
+                      <FolderIcon fontSize="large" />
+                      <Box>
+                        <Typography>{name}</Typography>
+                        <Typography variant="body2" color="GrayText">
+                          5 notes
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+            ) : null}
+          </Box>
+
+          <Typography fontWeight="bold">Recent notes</Typography>
           <NoteList
             notes={unarchivedNotes}
             emptyState={{

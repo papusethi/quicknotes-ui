@@ -2,6 +2,8 @@ import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
+import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
+import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
@@ -28,6 +30,7 @@ import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
+import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
 
 export const newNoteInitData: INote = {
@@ -59,6 +62,9 @@ const CreateNote: React.FC = () => {
 
   const [openLabelPopover, setOpenLabelPopover] = useState(false);
   const [anchorElLabelPopover, setAnchorElLabelPopover] = useState<null | Element>(null);
+
+  const [openFolderPopover, setOpenFolderPopover] = useState(false);
+  const [anchorElFolderPopover, setAnchorElFolderPopover] = useState<null | Element>(null);
 
   const [openDatetimePopover, setOpenDatetimePopover] = useState(false);
   const [anchorElDatetimePopover, setAnchorElDatetimePopover] = useState<null | Element>(null);
@@ -192,6 +198,23 @@ const CreateNote: React.FC = () => {
     setNoteData(updatedNote);
   };
 
+  const handleClickMoveToFolder = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+    setOpenFolderPopover((prev) => !prev);
+    setAnchorElFolderPopover(anchorElFolderPopover ? null : event?.currentTarget);
+  };
+
+  const handleClickFolderOption = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, folderId: string) => {
+    event.stopPropagation();
+    if (!noteData) {
+      return;
+    }
+
+    // Move to new folder
+    const updatedNote = { ...noteData, folderId: folderId };
+    setNoteData(updatedNote);
+  };
+
   const handleClickNoteColor = (colorValue: string) => {
     if (!noteData) {
       return;
@@ -255,7 +278,8 @@ const CreateNote: React.FC = () => {
       ),
       onClick: handleClickArchive
     },
-    { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel }
+    { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel },
+    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder }
   ];
 
   return (
@@ -338,6 +362,14 @@ const CreateNote: React.FC = () => {
                 onClickOption={handleClickLabelOption}
               />
 
+              <FolderPopover
+                open={openFolderPopover}
+                anchorEl={anchorElFolderPopover}
+                selectedFolderId={noteData?.folderId}
+                onClose={handleClickMoveToFolder}
+                onClickOption={handleClickFolderOption}
+              />
+
               <Box flex={1} display="flex" justifyContent="flex-end" alignItems="center">
                 <Button size="small" onClick={handleClickClose}>
                   Close
@@ -348,6 +380,7 @@ const CreateNote: React.FC = () => {
         ) : (
           <Card elevation={3} onClick={handleClickCard}>
             <Box px={2} py={1} display="flex" alignItems="center">
+              <LightbulbOutlinedIcon color="action" fontSize="small" sx={{ mr: 1 }} />
               <Typography flex={1} fontWeight={500}>
                 Take a note...
               </Typography>
