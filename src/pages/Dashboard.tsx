@@ -1,5 +1,7 @@
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
+import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
+import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import HomeIcon from "@mui/icons-material/Home";
@@ -242,7 +244,7 @@ const Dashboard: React.FC = () => {
 
   // list items generated from labels.
   const listItemsFromLabels = userLabels.map(({ _id, name }) => ({
-    id: name,
+    id: "label" + name,
     text: name,
     Icon: LabelOutlinedIcon,
     ActiveIcon: LabelIcon,
@@ -253,6 +255,34 @@ const Dashboard: React.FC = () => {
           emptyState={{
             Icon: <LocalOfferOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
             title: `Notes with ${name} label appear here`
+          }}
+          onClickPinNote={handleClickPinNote}
+          onClickDeleteNote={handleClickDeleteNote}
+          onClickRemindMe={handleClickRemindMe}
+          onClickRemoveReminder={handleClickRemoveReminder}
+          onClickBgOptions={handleClickBgOptions}
+          onClickArchive={handleClickArchive}
+          onClickUpdateLabel={handleClickUpdateLabel}
+          onClickCard={handleClickCard}
+          onClickMakeCopy={handleClickMakeCopy}
+        />
+      </Box>
+    )
+  }));
+
+  // list items generated from folders.
+  const listItemsFromFolders = userFolders.map(({ _id, name }) => ({
+    id: "folder" + name,
+    text: name,
+    Icon: FolderOutlinedIcon,
+    ActiveIcon: FolderIcon,
+    content: (
+      <Box>
+        <NoteList
+          notes={userNotes?.filter(({ folderId }) => folderId === _id)}
+          emptyState={{
+            Icon: <FolderIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+            title: `Notes with ${name} folder appear here`
           }}
           onClickPinNote={handleClickPinNote}
           onClickDeleteNote={handleClickDeleteNote}
@@ -355,6 +385,7 @@ const Dashboard: React.FC = () => {
       )
     },
 
+    ...listItemsFromFolders,
     ...listItemsFromLabels,
 
     {
@@ -374,8 +405,8 @@ const Dashboard: React.FC = () => {
     {
       id: "manageFolders",
       text: "Manage folders",
-      Icon: FolderOutlinedIcon,
-      ActiveIcon: FolderIcon,
+      Icon: CreateNewFolderOutlinedIcon,
+      ActiveIcon: CreateNewFolderIcon,
       content: (
         <Box>
           <Typography variant="h6">Manage folders</Typography>
@@ -423,7 +454,7 @@ const Dashboard: React.FC = () => {
         <Box flex={1}>
           <List>
             {listConfig.map(({ id, text, Icon, ActiveIcon }) => (
-              <ListItem key={id} disablePadding disableGutters>
+              <ListItem key={id} disablePadding disableGutters dense>
                 <ListItemButton
                   selected={selectedId === id}
                   onClick={() => handleClickListItem(id)}
