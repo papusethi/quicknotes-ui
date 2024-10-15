@@ -43,7 +43,6 @@ const NoteList: React.FC<INoteListProps> = (props) => {
     <Fragment>
       {Array.isArray(notes) && notes.length > 0 ? (
         <Box
-          my={2}
           display="grid"
           gap={1}
           gridTemplateColumns={userPreferences?.viewType === "list" ? "repeat(1, 1fr)" : "repeat(3, 1fr)"}

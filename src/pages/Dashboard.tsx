@@ -14,20 +14,9 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import {
-  Box,
-  Divider,
-  Fab,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Typography
-} from "@mui/material";
+import { Box, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
-import CreateNote from "../components/create-note/CreateNote";
 import EditNote from "../components/edit-note/EditNote";
 import FolderList from "../components/folder-list/FolderList";
 import Header from "../components/header/Header";
@@ -318,55 +307,62 @@ const Dashboard: React.FC = () => {
       ActiveIcon: HomeIcon,
       content: (
         <Box>
-          <Box>
-            {Array.isArray(userFolders) && userFolders.length ? (
-              <Box>
-                <Typography>Recent folders</Typography>
-                <Box my={2} display="grid" gap={2} gridTemplateColumns="repeat(4, 1fr)">
-                  {userFolders.map(({ _id, name }) => (
-                    <Box
-                      key={_id}
-                      borderRadius={2}
-                      border="1px solid"
-                      borderColor="GrayText"
-                      paddingY={1}
-                      paddingX={2}
-                      display="flex"
-                      gap={2}
-                      alignItems="center"
-                    >
-                      <FolderIcon fontSize="large" />
-                      <Box>
-                        <Typography>{name}</Typography>
-                        <Typography variant="body2" color="GrayText">
-                          5 notes
-                        </Typography>
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
-              </Box>
-            ) : null}
+          <Box mb={2}>
+            <Typography variant="h6">Welcome home, {currentUser?.username}</Typography>
+            <Typography variant="body2">Together, we'll venture into exciting new realms!</Typography>
           </Box>
 
-          <Typography>Recent notes</Typography>
-          <NoteList
-            notes={unarchivedNotes}
-            emptyState={{
-              Icon: <LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-              title: "Nothing to see yet, why not start a new note?",
-              subtitle: "It's time to save some ideas and thoughts of yours"
-            }}
-            onClickPinNote={handleClickPinNote}
-            onClickDeleteNote={handleClickDeleteNote}
-            onClickRemindMe={handleClickRemindMe}
-            onClickRemoveReminder={handleClickRemoveReminder}
-            onClickBgOptions={handleClickBgOptions}
-            onClickArchive={handleClickArchive}
-            onClickUpdateLabel={handleClickUpdateLabel}
-            onClickCard={handleClickCard}
-            onClickMakeCopy={handleClickMakeCopy}
-          />
+          {Array.isArray(userFolders) && userFolders.length ? (
+            <Box>
+              <Typography>Recent folders</Typography>
+              <Box my={1} display="grid" gap={2} gridTemplateColumns="repeat(4, 1fr)">
+                {userFolders.map(({ _id, name }) => (
+                  <Box
+                    key={_id}
+                    borderRadius={2}
+                    border="1px solid"
+                    borderColor={(theme) => theme.palette.divider}
+                    paddingY={1}
+                    paddingX={2}
+                    display="flex"
+                    gap={2}
+                    alignItems="center"
+                  >
+                    <FolderIcon fontSize="large" color="action" />
+                    <Box>
+                      <Typography>{name}</Typography>
+                      <Typography variant="body2" color="GrayText">
+                        5 notes
+                      </Typography>
+                    </Box>
+                  </Box>
+                ))}
+              </Box>
+            </Box>
+          ) : null}
+
+          <Box mt={2}>
+            <Typography>Recent notes</Typography>
+            <Box mt={1}>
+              <NoteList
+                notes={unarchivedNotes}
+                emptyState={{
+                  Icon: <LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+                  title: "Nothing to see yet, why not start a new note?",
+                  subtitle: "It's time to save some ideas and thoughts of yours"
+                }}
+                onClickPinNote={handleClickPinNote}
+                onClickDeleteNote={handleClickDeleteNote}
+                onClickRemindMe={handleClickRemindMe}
+                onClickRemoveReminder={handleClickRemoveReminder}
+                onClickBgOptions={handleClickBgOptions}
+                onClickArchive={handleClickArchive}
+                onClickUpdateLabel={handleClickUpdateLabel}
+                onClickCard={handleClickCard}
+                onClickMakeCopy={handleClickMakeCopy}
+              />
+            </Box>
+          </Box>
         </Box>
       )
     },
@@ -377,6 +373,11 @@ const Dashboard: React.FC = () => {
       ActiveIcon: NotificationsIcon,
       content: (
         <Box>
+          <Box mb={2}>
+            <Typography variant="h6">Reminders</Typography>
+            <Typography variant="body2">Notes with upcoming reminders appear here!</Typography>
+          </Box>
+
           <NoteList
             notes={upcomingReminderNotes}
             emptyState={{
@@ -403,6 +404,11 @@ const Dashboard: React.FC = () => {
       ActiveIcon: ArchiveIcon,
       content: (
         <Box>
+          <Box mb={2}>
+            <Typography variant="h6">Archived</Typography>
+            <Typography variant="body2">Your archived notes appear here!</Typography>
+          </Box>
+
           <NoteList
             notes={archivedNotes}
             emptyState={{
@@ -464,11 +470,9 @@ const Dashboard: React.FC = () => {
     <Box>
       <Header />
 
-      <Divider />
-
       <Box m={2} display="flex" gap={4}>
         <Box flex={1}>
-          <Box>
+          <Box mb={1}>
             <Fab variant="extended" size="medium" color="primary">
               <AddIcon sx={{ mr: 1 }} fontSize="small" />
               Create
@@ -529,14 +533,13 @@ const Dashboard: React.FC = () => {
 
         <Box flex={4}>
           <Box borderRadius={6}>
-            <Typography variant="h6">Welcome, {currentUser?.username}</Typography>
-            <Typography variant="body2">Together, we'll venture into exciting new realms!</Typography>
+            {/* <CreateNote /> */}
 
-            <CreateNote />
-
-            {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
-            {listConfigFolders?.find((item) => item.id === selectedId)?.content ?? null}
-            {listConfigLabels?.find((item) => item.id === selectedId)?.content ?? null}
+            <Box>
+              {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
+              {listConfigFolders?.find((item) => item.id === selectedId)?.content ?? null}
+              {listConfigLabels?.find((item) => item.id === selectedId)?.content ?? null}
+            </Box>
           </Box>
 
           <EditNote open={openEditNote} note={currentNote} onClose={handleClickClose} />
