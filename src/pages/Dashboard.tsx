@@ -1,3 +1,4 @@
+import AddIcon from "@mui/icons-material/Add";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
@@ -13,7 +14,17 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import { Box, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import {
+  Box,
+  Divider,
+  Fab,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Typography
+} from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
 import CreateNote from "../components/create-note/CreateNote";
@@ -61,6 +72,7 @@ export interface INote {
 const Dashboard: React.FC = () => {
   const dispatch = useAppDispatch();
 
+  const currentUser = useAppSelector((state) => state.user.currentUser);
   const userNotes = useAppSelector((state) => state.user.userNotes);
   const userLabels = useAppSelector((state) => state.user.userLabels);
   const userFolders = useAppSelector((state) => state.user.userFolders);
@@ -309,7 +321,7 @@ const Dashboard: React.FC = () => {
           <Box>
             {Array.isArray(userFolders) && userFolders.length ? (
               <Box>
-                <Typography fontWeight="bold">Recent folders</Typography>
+                <Typography>Recent folders</Typography>
                 <Box my={2} display="grid" gap={2} gridTemplateColumns="repeat(4, 1fr)">
                   {userFolders.map(({ _id, name }) => (
                     <Box
@@ -337,7 +349,7 @@ const Dashboard: React.FC = () => {
             ) : null}
           </Box>
 
-          <Typography fontWeight="bold">Recent notes</Typography>
+          <Typography>Recent notes</Typography>
           <NoteList
             notes={unarchivedNotes}
             emptyState={{
@@ -384,38 +396,6 @@ const Dashboard: React.FC = () => {
         </Box>
       )
     },
-
-    ...listItemsFromFolders,
-    ...listItemsFromLabels,
-
-    {
-      id: "manageLabels",
-      text: "Manage labels",
-      Icon: LocalOfferOutlinedIcon,
-      ActiveIcon: LocalOfferIcon,
-      content: (
-        <Box>
-          <Typography variant="h6">Manage labels</Typography>
-          <Box mt={2}>
-            <LabelList />
-          </Box>
-        </Box>
-      )
-    },
-    {
-      id: "manageFolders",
-      text: "Manage folders",
-      Icon: CreateNewFolderOutlinedIcon,
-      ActiveIcon: CreateNewFolderIcon,
-      content: (
-        <Box>
-          <Typography variant="h6">Manage folders</Typography>
-          <Box mt={2}>
-            <FolderList />
-          </Box>
-        </Box>
-      )
-    },
     {
       id: "archived",
       text: "Archived",
@@ -444,23 +424,100 @@ const Dashboard: React.FC = () => {
     }
   ];
 
+  const listConfigFolders = [
+    {
+      id: "manageFolders",
+      text: "Manage folders",
+      Icon: CreateNewFolderOutlinedIcon,
+      ActiveIcon: CreateNewFolderIcon,
+      content: (
+        <Box>
+          <Typography variant="h6">Manage folders</Typography>
+          <Box mt={2}>
+            <FolderList />
+          </Box>
+        </Box>
+      )
+    },
+    ...listItemsFromFolders
+  ];
+
+  const listConfigLabels = [
+    {
+      id: "manageLabels",
+      text: "Manage labels",
+      Icon: LocalOfferOutlinedIcon,
+      ActiveIcon: LocalOfferIcon,
+      content: (
+        <Box>
+          <Typography variant="h6">Manage labels</Typography>
+          <Box mt={2}>
+            <LabelList />
+          </Box>
+        </Box>
+      )
+    },
+    ...listItemsFromLabels
+  ];
+
   return (
     <Box>
       <Header />
 
       <Divider />
 
-      <Box display="flex" gap={2}>
+      <Box m={2} display="flex" gap={4}>
         <Box flex={1}>
+          <Box>
+            <Fab variant="extended" size="medium" color="primary">
+              <AddIcon sx={{ mr: 1 }} fontSize="small" />
+              Create
+            </Fab>
+          </Box>
+
           <List>
             {listConfig.map(({ id, text, Icon, ActiveIcon }) => (
               <ListItem key={id} disablePadding disableGutters dense>
                 <ListItemButton
                   selected={selectedId === id}
                   onClick={() => handleClickListItem(id)}
-                  sx={{ borderTopRightRadius: 8, borderBottomRightRadius: 8 }}
+                  sx={{ borderRadius: 8 }}
                 >
-                  <ListItemIcon>
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
+                  </ListItemIcon>
+                  <ListItemText>{text}</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+
+          <List>
+            {listConfigFolders.map(({ id, text, Icon, ActiveIcon }) => (
+              <ListItem key={id} disablePadding disableGutters dense>
+                <ListItemButton
+                  selected={selectedId === id}
+                  onClick={() => handleClickListItem(id)}
+                  sx={{ borderRadius: 8 }}
+                >
+                  <ListItemIcon sx={{ minWidth: 32 }}>
+                    {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
+                  </ListItemIcon>
+                  <ListItemText>{text}</ListItemText>
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+
+          <List>
+            {listConfigLabels.map(({ id, text, Icon, ActiveIcon }) => (
+              <ListItem key={id} disablePadding disableGutters dense>
+                <ListItemButton
+                  selected={selectedId === id}
+                  onClick={() => handleClickListItem(id)}
+                  sx={{ borderRadius: 8 }}
+                >
+                  <ListItemIcon sx={{ minWidth: 32 }}>
                     {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
                   </ListItemIcon>
                   <ListItemText>{text}</ListItemText>
@@ -471,10 +528,15 @@ const Dashboard: React.FC = () => {
         </Box>
 
         <Box flex={4}>
-          <Box p={2}>
+          <Box borderRadius={6}>
+            <Typography variant="h6">Welcome, {currentUser?.username}</Typography>
+            <Typography variant="body2">Together, we'll venture into exciting new realms!</Typography>
+
             <CreateNote />
 
             {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
+            {listConfigFolders?.find((item) => item.id === selectedId)?.content ?? null}
+            {listConfigLabels?.find((item) => item.id === selectedId)?.content ?? null}
           </Box>
 
           <EditNote open={openEditNote} note={currentNote} onClose={handleClickClose} />
