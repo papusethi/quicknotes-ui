@@ -8,7 +8,6 @@ import {
   Button,
   Card,
   CardContent,
-  Divider,
   List,
   ListItem,
   ListItemButton,
@@ -213,21 +212,19 @@ const Profile: React.FC = () => {
     <Box>
       <Header />
 
-      <Divider />
-
-      <Box display="flex">
+      <Box m={2} display="flex" gap={4}>
         <Box flex={1}>
           <List>
             {listConfig?.map((item) => {
               const { id, text, Icon } = item;
               return (
-                <ListItem key={id} disablePadding disableGutters>
+                <ListItem key={id} disablePadding disableGutters dense>
                   <ListItemButton
                     selected={selectedId === id}
                     onClick={() => handleClickListItem(id)}
-                    sx={{ borderTopRightRadius: 8, borderBottomRightRadius: 8 }}
+                    sx={{ borderRadius: 8 }}
                   >
-                    <ListItemIcon>
+                    <ListItemIcon sx={{ minWidth: 32 }}>
                       <Icon fontSize="small" color={id === selectedId ? "primary" : "inherit"} />
                     </ListItemIcon>
                     <ListItemText>{text}</ListItemText>
@@ -239,7 +236,7 @@ const Profile: React.FC = () => {
         </Box>
 
         <Box flex={4}>
-          <Box py={1} px={2}>
+          <Box borderRadius={6}>
             <Card variant="outlined">
               <CardContent>{listConfig?.find((item) => item.id === selectedId)?.content ?? null}</CardContent>
             </Card>

@@ -3,6 +3,8 @@ import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
 import CreateNewFolderOutlinedIcon from "@mui/icons-material/CreateNewFolderOutlined";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import FolderIcon from "@mui/icons-material/Folder";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import HomeIcon from "@mui/icons-material/Home";
@@ -307,9 +309,8 @@ const Dashboard: React.FC = () => {
       ActiveIcon: HomeIcon,
       content: (
         <Box>
-          <Box mb={2}>
-            <Typography variant="h6">Welcome home, {currentUser?.username}</Typography>
-            <Typography variant="body2">Together, we'll venture into exciting new realms!</Typography>
+          <Box mb={3}>
+            <Typography variant="h6">Welcome home, {currentUser?.username}!</Typography>
           </Box>
 
           {Array.isArray(userFolders) && userFolders.length ? (
@@ -341,7 +342,7 @@ const Dashboard: React.FC = () => {
             </Box>
           ) : null}
 
-          <Box mt={2}>
+          <Box mt={3}>
             <Typography>Recent notes</Typography>
             <Box mt={1}>
               <NoteList
@@ -414,6 +415,37 @@ const Dashboard: React.FC = () => {
             emptyState={{
               Icon: <ArchiveOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
               title: "Your archived notes appear here"
+            }}
+            onClickPinNote={handleClickPinNote}
+            onClickDeleteNote={handleClickDeleteNote}
+            onClickRemindMe={handleClickRemindMe}
+            onClickRemoveReminder={handleClickRemoveReminder}
+            onClickBgOptions={handleClickBgOptions}
+            onClickArchive={handleClickArchive}
+            onClickUpdateLabel={handleClickUpdateLabel}
+            onClickCard={handleClickCard}
+            onClickMakeCopy={handleClickMakeCopy}
+          />
+        </Box>
+      )
+    },
+    {
+      id: "trash",
+      text: "Trash",
+      Icon: DeleteOutlinedIcon,
+      ActiveIcon: DeleteIcon,
+      content: (
+        <Box>
+          <Box mb={2}>
+            <Typography variant="h6">Trash</Typography>
+            <Typography variant="body2">Your deleted notes appear here!</Typography>
+          </Box>
+
+          <NoteList
+            notes={archivedNotes}
+            emptyState={{
+              Icon: <DeleteOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+              title: "Your deleted notes appear here!"
             }}
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
