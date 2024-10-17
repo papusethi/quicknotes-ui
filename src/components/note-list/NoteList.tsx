@@ -67,17 +67,13 @@ const NoteList: React.FC<INoteListProps> = (props) => {
         </Box>
       ) : (
         <Box my={2}>
-          <Card variant="outlined">
-            <CardContent>
-              <Box textAlign="center">{emptyState.Icon}</Box>
-              <Typography variant="h6" textAlign="center">
-                {emptyState.title}
-              </Typography>
-              <Typography variant="body2" textAlign="center">
-                {emptyState.subtitle}
-              </Typography>
-            </CardContent>
-          </Card>
+          <Box textAlign="center">{emptyState.Icon}</Box>
+          <Typography variant="h6" textAlign="center">
+            {emptyState.title}
+          </Typography>
+          <Typography variant="body2" textAlign="center">
+            {emptyState.subtitle}
+          </Typography>
         </Box>
       )}
     </Fragment>

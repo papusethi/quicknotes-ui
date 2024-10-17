@@ -27,6 +27,8 @@ import NoteList from "../components/note-list/NoteList";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setUserFolders, setUserLabels, setUserNotes } from "../redux/userSlice";
+import CreateNote from "../components/create-note/CreateNote";
+import NewNoteView from "../components/new-note/NewNoteView";
 
 export interface IFolderItem {
   readonly _id?: string;
@@ -73,6 +75,8 @@ const Dashboard: React.FC = () => {
   const [currentNote, setCurrentNote] = useState<null | INote>(null);
 
   const [completedTasks, setCompletedTasks] = useState(new Set());
+
+  const [openNewNote, setOpenNewNote] = useState(false);
 
   useEffect(() => {
     const fetchAllNotes = async () => {
@@ -227,6 +231,10 @@ const Dashboard: React.FC = () => {
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
+  };
+
+  const handleClickCreate = () => {
+    setOpenNewNote(true);
   };
 
   const unarchivedNotes: INote[] = [];
@@ -502,10 +510,10 @@ const Dashboard: React.FC = () => {
     <Box>
       <Header />
 
-      <Box m={2} display="flex" gap={4}>
+      <Box m={2} display="flex" gap={2}>
         <Box flex={1}>
           <Box mb={1}>
-            <Fab variant="extended" size="medium" color="primary">
+            <Fab variant="extended" size="medium" color="primary" onClick={handleClickCreate}>
               <AddIcon sx={{ mr: 1 }} fontSize="small" />
               Create
             </Fab>
@@ -567,11 +575,22 @@ const Dashboard: React.FC = () => {
           <Box borderRadius={6}>
             {/* <CreateNote /> */}
 
-            <Box>
-              {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
-              {listConfigFolders?.find((item) => item.id === selectedId)?.content ?? null}
-              {listConfigLabels?.find((item) => item.id === selectedId)?.content ?? null}
-            </Box>
+            {openNewNote ? (
+              <Box
+                p={2}
+                bgcolor={(theme) => theme.palette.action.hover}
+                border={(theme) => `1px solid ${theme.palette.divider}`}
+                borderRadius={4}
+              >
+                <NewNoteView />
+              </Box>
+            ) : (
+              <Box>
+                {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
+                {listConfigFolders?.find((item) => item.id === selectedId)?.content ?? null}
+                {listConfigLabels?.find((item) => item.id === selectedId)?.content ?? null}
+              </Box>
+            )}
           </Box>
 
           <EditNote open={openEditNote} note={currentNote} onClose={handleClickClose} />
