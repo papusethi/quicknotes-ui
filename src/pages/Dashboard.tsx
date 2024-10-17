@@ -29,6 +29,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { setUserFolders, setUserLabels, setUserNotes } from "../redux/userSlice";
 import CreateNote from "../components/create-note/CreateNote";
 import NewNoteView from "../components/new-note/NewNoteView";
+import SectionEmptyState from "../components/section-empty-state/SectionEmptyState";
 
 export interface IFolderItem {
   readonly _id?: string;
@@ -263,10 +264,10 @@ const Dashboard: React.FC = () => {
       <Box>
         <NoteList
           notes={userNotes?.filter(({ labels }) => labels && _id && labels.includes(_id))}
-          emptyState={{
-            Icon: <LocalOfferOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-            title: `Notes with ${name} label appear here`
-          }}
+          // emptyState={{
+          //   Icon: <LocalOfferOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+          //   title: `Notes with ${name} label appear here`
+          // }}
           onClickPinNote={handleClickPinNote}
           onClickDeleteNote={handleClickDeleteNote}
           onClickRemindMe={handleClickRemindMe}
@@ -291,10 +292,10 @@ const Dashboard: React.FC = () => {
       <Box>
         <NoteList
           notes={userNotes?.filter(({ folderId }) => folderId === _id)}
-          emptyState={{
-            Icon: <FolderIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-            title: `Notes with ${name} folder appear here`
-          }}
+          // emptyState={{
+          //   Icon: <FolderIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+          //   title: `Notes with ${name} folder appear here`
+          // }}
           onClickPinNote={handleClickPinNote}
           onClickDeleteNote={handleClickDeleteNote}
           onClickRemindMe={handleClickRemindMe}
@@ -350,28 +351,31 @@ const Dashboard: React.FC = () => {
             </Box>
           ) : null}
 
-          <Box mt={3}>
-            <Typography>Recent notes</Typography>
-            <Box mt={1}>
-              <NoteList
-                notes={unarchivedNotes}
-                emptyState={{
-                  Icon: <LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-                  title: "Nothing to see yet, why not start a new note?",
-                  subtitle: "It's time to save some ideas and thoughts of yours"
-                }}
-                onClickPinNote={handleClickPinNote}
-                onClickDeleteNote={handleClickDeleteNote}
-                onClickRemindMe={handleClickRemindMe}
-                onClickRemoveReminder={handleClickRemoveReminder}
-                onClickBgOptions={handleClickBgOptions}
-                onClickArchive={handleClickArchive}
-                onClickUpdateLabel={handleClickUpdateLabel}
-                onClickCard={handleClickCard}
-                onClickMakeCopy={handleClickMakeCopy}
-              />
+          {Array.isArray(unarchivedNotes) && unarchivedNotes.length ? (
+            <Box mt={3}>
+              <Typography>Recent notes</Typography>
+              <Box mt={1}>
+                <NoteList
+                  notes={unarchivedNotes}
+                  onClickPinNote={handleClickPinNote}
+                  onClickDeleteNote={handleClickDeleteNote}
+                  onClickRemindMe={handleClickRemindMe}
+                  onClickRemoveReminder={handleClickRemoveReminder}
+                  onClickBgOptions={handleClickBgOptions}
+                  onClickArchive={handleClickArchive}
+                  onClickUpdateLabel={handleClickUpdateLabel}
+                  onClickCard={handleClickCard}
+                  onClickMakeCopy={handleClickMakeCopy}
+                />
+              </Box>
             </Box>
-          </Box>
+          ) : (
+            <SectionEmptyState
+              Icon={<LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />}
+              title="Nothing to see yet, why not start a new note?"
+              subtitle="It's time to save some ideas and thoughts of yours"
+            />
+          )}
         </Box>
       )
     },
@@ -389,10 +393,10 @@ const Dashboard: React.FC = () => {
 
           <NoteList
             notes={upcomingReminderNotes}
-            emptyState={{
-              Icon: <NotificationsOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-              title: "Notes with upcoming reminders appear here"
-            }}
+            // emptyState={{
+            //   Icon: <NotificationsOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+            //   title: "Notes with upcoming reminders appear here"
+            // }}
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
             onClickRemindMe={handleClickRemindMe}
@@ -418,22 +422,26 @@ const Dashboard: React.FC = () => {
             <Typography variant="body2">Your archived notes appear here!</Typography>
           </Box>
 
-          <NoteList
-            notes={archivedNotes}
-            emptyState={{
-              Icon: <ArchiveOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-              title: "Your archived notes appear here"
-            }}
-            onClickPinNote={handleClickPinNote}
-            onClickDeleteNote={handleClickDeleteNote}
-            onClickRemindMe={handleClickRemindMe}
-            onClickRemoveReminder={handleClickRemoveReminder}
-            onClickBgOptions={handleClickBgOptions}
-            onClickArchive={handleClickArchive}
-            onClickUpdateLabel={handleClickUpdateLabel}
-            onClickCard={handleClickCard}
-            onClickMakeCopy={handleClickMakeCopy}
-          />
+          {Array.isArray(archivedNotes) && archivedNotes.length ? (
+            <NoteList
+              notes={archivedNotes}
+              onClickPinNote={handleClickPinNote}
+              onClickDeleteNote={handleClickDeleteNote}
+              onClickRemindMe={handleClickRemindMe}
+              onClickRemoveReminder={handleClickRemoveReminder}
+              onClickBgOptions={handleClickBgOptions}
+              onClickArchive={handleClickArchive}
+              onClickUpdateLabel={handleClickUpdateLabel}
+              onClickCard={handleClickCard}
+              onClickMakeCopy={handleClickMakeCopy}
+            />
+          ) : (
+            <SectionEmptyState
+              Icon={<ArchiveOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />}
+              title="Your archived notes appear here"
+              subtitle="It's time to save some ideas and thoughts of yours"
+            />
+          )}
         </Box>
       )
     },
@@ -451,10 +459,10 @@ const Dashboard: React.FC = () => {
 
           <NoteList
             notes={archivedNotes}
-            emptyState={{
-              Icon: <DeleteOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-              title: "Your deleted notes appear here!"
-            }}
+            // emptyState={{
+            //   Icon: <DeleteOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
+            //   title: "Your deleted notes appear here!"
+            // }}
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
             onClickRemindMe={handleClickRemindMe}

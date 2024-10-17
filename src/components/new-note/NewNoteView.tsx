@@ -44,7 +44,7 @@ const NewNoteView = () => {
 
   const [expandCard, setExpandCard] = useState(false);
 
-  const [noteData, setNoteData] = useState<null | INote>(null);
+  const [noteData, setNoteData] = useState<INote>(newNoteInitData);
 
   const [openColorPopover, setOpenColorPopover] = useState(false);
   const [anchorElColorPopover, setAnchorElColorPopover] = useState<null | Element>(null);
@@ -68,10 +68,6 @@ const NewNoteView = () => {
     }, {} as Record<string, string>);
   }, [userLabels]);
 
-  const handleClickAway = async (event: MouseEvent | TouchEvent) => {
-    await handleSaveNote();
-  };
-
   const handleClickClose = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     await handleSaveNote();
@@ -84,9 +80,6 @@ const NewNoteView = () => {
   //   };
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    if (!noteData) {
-      return;
-    }
     const { name, value } = event.target;
     const updateNote = { ...noteData, [name]: value };
     setNoteData(updateNote);
@@ -102,9 +95,6 @@ const NewNoteView = () => {
 
   const handleClickPinNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
-    if (!noteData) {
-      return;
-    }
     const updateNote = { ...noteData, isPinned: !noteData.isPinned };
     setNoteData(updateNote);
   };
@@ -116,20 +106,12 @@ const NewNoteView = () => {
   };
 
   const handleUpdateReminder = (dueDateTime: Date | null) => {
-    if (!noteData) {
-      return;
-    }
-
     const updateNote = { ...noteData, dueDateTime: dueDateTime };
     setNoteData(updateNote);
   };
 
   const handleClickRemoveReminder = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
-    if (!noteData) {
-      return;
-    }
-
     const updateNote = { ...noteData, dueDateTime: null };
     setNoteData(updateNote);
   };
@@ -148,9 +130,6 @@ const NewNoteView = () => {
 
   const handleClickLabelOption = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, labelId: string) => {
     event.stopPropagation();
-    if (!noteData) {
-      return;
-    }
 
     if (Array.isArray(noteData?.labels)) {
       if (noteData.labels.includes(labelId)) {
@@ -173,9 +152,6 @@ const NewNoteView = () => {
 
   const handleClickRemoveLabel = (event: any, labelId: string) => {
     event.stopPropagation();
-    if (!noteData) {
-      return;
-    }
 
     const updatedLabels = noteData?.labels?.filter((eachLabelId) => eachLabelId !== labelId);
     const updatedNote = { ...noteData, labels: updatedLabels ?? null };
@@ -190,9 +166,6 @@ const NewNoteView = () => {
 
   const handleClickFolderOption = (event: React.MouseEvent<HTMLLIElement, MouseEvent>, folderId: string) => {
     event.stopPropagation();
-    if (!noteData) {
-      return;
-    }
 
     // Move to new folder
     const updatedNote = { ...noteData, folderId: folderId };
@@ -200,27 +173,18 @@ const NewNoteView = () => {
   };
 
   const handleClickNoteColor = (colorValue: string) => {
-    if (!noteData) {
-      return;
-    }
     const updateNote = { ...noteData, color: noteData.color === colorValue ? null : colorValue };
     setNoteData(updateNote);
   };
 
   const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
-    if (!noteData) {
-      return;
-    }
+
     const updateNote = { ...noteData, isArchived: !noteData.isArchived };
     setNoteData(updateNote);
   };
 
   const handleSaveNote = async () => {
-    if (!noteData) {
-      return;
-    }
-
     if (
       noteData.title.trim() ||
       noteData.description.trim() ||
@@ -265,6 +229,8 @@ const NewNoteView = () => {
     { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel },
     { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder }
   ];
+
+  console.log(noteData);
 
   return (
     <Box>
