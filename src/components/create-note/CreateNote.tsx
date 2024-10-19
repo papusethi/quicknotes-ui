@@ -293,7 +293,7 @@ const CreateNote: React.FC = () => {
               {noteData?.type === "CHECKLIST" && (
                 <ContentChecklistView
                   note={noteData}
-                  onUpdateTitle={handleChangeNoteFields}
+                  // onUpdateTitle={handleChangeNoteFields}
                   onUpdateTasks={handleUpdateInChecklistView}
                 />
               )}

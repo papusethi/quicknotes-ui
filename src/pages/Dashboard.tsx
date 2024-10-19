@@ -1,4 +1,3 @@
-import AddIcon from "@mui/icons-material/Add";
 import ArchiveIcon from "@mui/icons-material/Archive";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import CreateNewFolderIcon from "@mui/icons-material/CreateNewFolder";
@@ -16,20 +15,20 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import { Box, Fab, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
-import EditNote from "../components/edit-note/EditNote";
+import CreateButton from "../components/create-button/CreateButton";
 import FolderList from "../components/folder-list/FolderList";
 import Header from "../components/header/Header";
 import LabelList from "../components/label-list/LabelList";
+import NoteEditorView from "../components/note-editor/NoteEditorView";
 import NoteList from "../components/note-list/NoteList";
+import SectionEmptyState from "../components/section-empty-state/SectionEmptyState";
 import { openSnackbarAlert } from "../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { openNoteEditor, setCurrentNote } from "../redux/noteSlice";
 import { setUserFolders, setUserLabels, setUserNotes } from "../redux/userSlice";
-import CreateNote from "../components/create-note/CreateNote";
-import NewNoteView from "../components/new-note/NewNoteView";
-import SectionEmptyState from "../components/section-empty-state/SectionEmptyState";
 
 export interface IFolderItem {
   readonly _id?: string;
@@ -70,14 +69,11 @@ const Dashboard: React.FC = () => {
   const userNotes = useAppSelector((state) => state.user.userNotes);
   const userLabels = useAppSelector((state) => state.user.userLabels);
   const userFolders = useAppSelector((state) => state.user.userFolders);
+  const isOpenNoteEditor = useAppSelector((state) => state.note.isOpenNoteEditor);
 
   const [selectedId, setSelectedId] = useState("home");
-  const [openEditNote, setOpenEditNote] = useState(false);
-  const [currentNote, setCurrentNote] = useState<null | INote>(null);
 
   const [completedTasks, setCompletedTasks] = useState(new Set());
-
-  const [openNewNote, setOpenNewNote] = useState(false);
 
   useEffect(() => {
     const fetchAllNotes = async () => {
@@ -133,11 +129,6 @@ const Dashboard: React.FC = () => {
 
   const handleClickListItem = (newTabId: string) => {
     setSelectedId(newTabId);
-  };
-
-  const handleClickClose = () => {
-    setOpenEditNote(false);
-    setCurrentNote(null);
   };
 
   const handleClickDeleteNote = async (event: React.MouseEvent<HTMLLIElement, MouseEvent>, note: INote) => {
@@ -217,8 +208,8 @@ const Dashboard: React.FC = () => {
   };
 
   const handleClickCard = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    setOpenEditNote(true);
-    setCurrentNote(note);
+    dispatch(openNoteEditor());
+    dispatch(setCurrentNote(note));
   };
 
   const handleClickMakeCopy = async (event: React.MouseEvent<HTMLLIElement, MouseEvent>, note: INote) => {
@@ -232,10 +223,6 @@ const Dashboard: React.FC = () => {
     } catch (error: any) {
       dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
     }
-  };
-
-  const handleClickCreate = () => {
-    setOpenNewNote(true);
   };
 
   const unarchivedNotes: INote[] = [];
@@ -521,10 +508,7 @@ const Dashboard: React.FC = () => {
       <Box m={2} display="flex" gap={2}>
         <Box flex={1} maxWidth={240}>
           <Box mb={1}>
-            <Fab variant="extended" size="medium" color="primary" onClick={handleClickCreate}>
-              <AddIcon sx={{ mr: 1 }} fontSize="small" />
-              Create
-            </Fab>
+            <CreateButton />
           </Box>
 
           <List>
@@ -581,16 +565,9 @@ const Dashboard: React.FC = () => {
 
         <Box flex={4}>
           <Box borderRadius={6}>
-            {/* <CreateNote /> */}
-
-            {openNewNote ? (
-              <Box
-                p={2}
-                bgcolor={(theme) => theme.palette.action.hover}
-                border={(theme) => `1px solid ${theme.palette.divider}`}
-                borderRadius={4}
-              >
-                <NewNoteView onClose={() => setOpenNewNote(false)} />
+            {isOpenNoteEditor ? (
+              <Box>
+                <NoteEditorView />
               </Box>
             ) : (
               <Box>
@@ -600,8 +577,6 @@ const Dashboard: React.FC = () => {
               </Box>
             )}
           </Box>
-
-          <EditNote open={openEditNote} note={currentNote} onClose={handleClickClose} />
         </Box>
       </Box>
     </Box>

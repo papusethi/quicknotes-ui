@@ -1,43 +1,42 @@
+import { ArrowBack } from "@mui/icons-material";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
-import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
-import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
-import { Box, Button, Chip, IconButton, TextField, Tooltip } from "@mui/material";
-import React, { Fragment, useMemo, useState } from "react";
+import { Box, Chip, IconButton, TextField, Tooltip } from "@mui/material";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
-import { INote } from "../../pages/Dashboard";
+import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { closeNoteEditor } from "../../redux/noteSlice";
 import { setUserNotes } from "../../redux/userSlice";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
+import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
+import ContentNoteView from "../content-note-view/ContentNoteView";
 import { newNoteInitData } from "../create-note/CreateNote";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
 
-interface INewNoteViewProps {
-  onClose: () => void;
-}
-
-const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
-  const { onClose } = props;
-
+const NoteEditorView: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
+  const currentNote = useAppSelector((state) => state.note.currentNote);
 
   const userLabels = useAppSelector((state) => state.user.userLabels);
 
-  const [expandActions, setExpandActions] = useState(true);
-
   const [noteData, setNoteData] = useState<INote>(newNoteInitData);
+
+  useEffect(() => {
+    setNoteData(currentNote ?? newNoteInitData);
+  }, [currentNote]);
 
   const [openColorPopover, setOpenColorPopover] = useState(false);
   const [anchorElColorPopover, setAnchorElColorPopover] = useState<null | Element>(null);
@@ -64,18 +63,8 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
   const handleClickClose = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     await handleSaveNote();
-    onClose();
+    dispatch(closeNoteEditor());
   };
-
-  const handleClickExpand = () => {
-    setExpandActions((prev) => !prev);
-  };
-
-  //   const handleClickChecklist = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-  //     event.stopPropagation();
-  //     setExpandCard(true);
-  //     setNoteData({ ...newNoteInitData, type: "CHECKLIST" });
-  //   };
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -83,13 +72,10 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
     setNoteData(updateNote);
   };
 
-  //   const handleUpdateInChecklistView = (tasks: ITaskItem[] | null) => {
-  //     if (!noteData) {
-  //       return;
-  //     }
-  //     const updateNote = { ...noteData, tasks: tasks };
-  //     setNoteData(updateNote);
-  //   };
+  const handleUpdateInChecklistView = (tasks: ITaskItem[] | null) => {
+    const updateNote = { ...noteData, tasks: tasks };
+    setNoteData(updateNote);
+  };
 
   const handleClickPinNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
@@ -192,7 +178,6 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
       try {
         const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
         dispatch(setUserNotes(data?.data));
-        setNoteData(newNoteInitData);
       } catch (error: any) {
         dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
       }
@@ -228,8 +213,19 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
 
   return (
     <Box>
-      <Box>
+      <Box
+        p={1.5}
+        borderRadius={4}
+        bgcolor={(theme) => theme.palette.action.hover}
+        border={(theme) => `1px solid ${theme.palette.divider}`}
+      >
         <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+          <Tooltip title="Back">
+            <IconButton size="small" onClick={handleClickClose}>
+              <ArrowBack fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
           <Box flex={1}>
             <TextField
               fullWidth
@@ -244,25 +240,7 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
             />
           </Box>
 
-          <Box>
-            <Button size="small" onClick={handleClickClose}>
-              Close
-            </Button>
-            <Tooltip title={expandActions ? "Hide actions" : "Show actions"}>
-              <IconButton size="small" onClick={handleClickExpand}>
-                {expandActions ? (
-                  <ExpandLessOutlinedIcon fontSize="small" />
-                ) : (
-                  <ExpandMoreOutlinedIcon fontSize="small" />
-                )}
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Box>
-
-        {expandActions ? (
           <Box
-            mt={0.5}
             p={0.5}
             borderRadius={8}
             bgcolor={(theme) => theme.palette.action.hover}
@@ -312,7 +290,7 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
               />
             </Box>
           </Box>
-        ) : null}
+        </Box>
 
         <Box>
           {Array.isArray(noteData?.labels) && noteData?.labels.length ? (
@@ -346,23 +324,15 @@ const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
         </Box>
 
         <Box mt={1}>
-          <TextField
-            fullWidth
-            multiline
-            autoFocus
-            size="small"
-            variant="standard"
-            name="description"
-            placeholder="Take a note..."
-            inputProps={{ style: { fontSize: 14 } }}
-            InputProps={{ disableUnderline: true }}
-            value={noteData?.description}
-            onChange={(event) => handleChangeNoteFields(event)}
-          />
+          {noteData.type === "CHECKLIST" ? (
+            <ContentChecklistView note={noteData} onUpdateTasks={handleUpdateInChecklistView} />
+          ) : (
+            <ContentNoteView note={noteData} onUpdate={handleChangeNoteFields} />
+          )}
         </Box>
       </Box>
     </Box>
   );
 };
 
-export default NewNoteView;
+export default NoteEditorView;

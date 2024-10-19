@@ -10,7 +10,6 @@ import { INote, ITaskItem } from "../../pages/Dashboard";
 
 interface IContentChecklistViewProps {
   note: INote;
-  onUpdateTitle: Function;
   onUpdateTasks: Function;
 }
 
@@ -23,7 +22,7 @@ const updateTaskOrderValue = (arr: any[]) => {
 };
 
 const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
-  const { note, onUpdateTitle, onUpdateTasks } = props;
+  const { note, onUpdateTasks } = props;
 
   const taskList = note.tasks;
 
@@ -101,19 +100,6 @@ const ContentChecklistView: React.FC<IContentChecklistViewProps> = (props) => {
 
   return (
     <Fragment>
-      <TextField
-        fullWidth
-        multiline
-        size="small"
-        variant="standard"
-        name="title"
-        placeholder="Untitled note"
-        inputProps={{ style: { fontSize: 20 } }}
-        InputProps={{ disableUnderline: true }}
-        value={note.title}
-        onChange={(event) => onUpdateTitle(event)}
-      />
-
       <Box mt={1}>
         <List disablePadding>
           <ListItem disablePadding>

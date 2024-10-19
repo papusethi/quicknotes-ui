@@ -12,19 +12,6 @@ const ContentNoteView: React.FC<IContentNoteViewProps> = (props) => {
 
   return (
     <Fragment>
-      <TextField
-        fullWidth
-        multiline
-        size="small"
-        variant="standard"
-        name="title"
-        placeholder="Untitled note"
-        inputProps={{ style: { fontSize: 20 } }}
-        InputProps={{ disableUnderline: true }}
-        value={note.title}
-        onChange={(event) => onUpdate(event)}
-      />
-
       <Box mt={1}>
         <TextField
           fullWidth

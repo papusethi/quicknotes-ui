@@ -22,8 +22,8 @@ const ColorPickerPopover: React.FC<IColorPickerPopoverProps> = (props) => {
     <Popover
       open={open}
       anchorEl={anchorEl}
-      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      transformOrigin={{ vertical: "top", horizontal: "center" }}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
       onClose={(event: any) => {
         event?.stopPropagation();
         onClose();

@@ -16,8 +16,8 @@ import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
 import { newNoteInitData } from "../create-note/CreateNote";
-import LabelPopover from "../label-popover/LabelPopover";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
+import LabelPopover from "../label-popover/LabelPopover";
 
 interface IEditNoteProps {
   open: boolean;
@@ -243,7 +243,7 @@ const EditNote: React.FC<IEditNoteProps> = (props) => {
         {noteData?.type === "CHECKLIST" && (
           <ContentChecklistView
             note={noteData}
-            onUpdateTitle={handleChangeNoteFields}
+            // onUpdateTitle={handleChangeNoteFields}
             onUpdateTasks={handleUpdateInChecklistView}
           />
         )}
