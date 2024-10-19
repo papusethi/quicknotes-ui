@@ -519,7 +519,7 @@ const Dashboard: React.FC = () => {
       <Header />
 
       <Box m={2} display="flex" gap={2}>
-        <Box flex={1}>
+        <Box flex={1} maxWidth={240}>
           <Box mb={1}>
             <Fab variant="extended" size="medium" color="primary" onClick={handleClickCreate}>
               <AddIcon sx={{ mr: 1 }} fontSize="small" />
@@ -590,7 +590,7 @@ const Dashboard: React.FC = () => {
                 border={(theme) => `1px solid ${theme.palette.divider}`}
                 borderRadius={4}
               >
-                <NewNoteView />
+                <NewNoteView onClose={() => setOpenNewNote(false)} />
               </Box>
             ) : (
               <Box>

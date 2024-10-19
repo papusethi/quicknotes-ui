@@ -1,48 +1,41 @@
+import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
-import CheckBoxOutlinedIcon from "@mui/icons-material/CheckBoxOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
+import ExpandLessOutlinedIcon from "@mui/icons-material/ExpandLessOutlined";
+import ExpandMoreOutlinedIcon from "@mui/icons-material/ExpandMoreOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
-import {
-  Box,
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Chip,
-  ClickAwayListener,
-  IconButton,
-  TextField,
-  Tooltip,
-  Typography
-} from "@mui/material";
+import { Box, Button, Chip, IconButton, TextField, Tooltip } from "@mui/material";
 import React, { Fragment, useMemo, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
-import { INote, ITaskItem } from "../../pages/Dashboard";
+import { INote } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserNotes } from "../../redux/userSlice";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
-import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
-import ContentNoteView from "../content-note-view/ContentNoteView";
+import { newNoteInitData } from "../create-note/CreateNote";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
-import { newNoteInitData } from "../create-note/CreateNote";
 
-const NewNoteView = () => {
+interface INewNoteViewProps {
+  onClose: () => void;
+}
+
+const NewNoteView: React.FC<INewNoteViewProps> = (props) => {
+  const { onClose } = props;
+
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
 
   const userLabels = useAppSelector((state) => state.user.userLabels);
 
-  const [expandCard, setExpandCard] = useState(false);
+  const [expandActions, setExpandActions] = useState(true);
 
   const [noteData, setNoteData] = useState<INote>(newNoteInitData);
 
@@ -71,6 +64,11 @@ const NewNoteView = () => {
   const handleClickClose = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     await handleSaveNote();
+    onClose();
+  };
+
+  const handleClickExpand = () => {
+    setExpandActions((prev) => !prev);
   };
 
   //   const handleClickChecklist = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -168,7 +166,7 @@ const NewNoteView = () => {
     event.stopPropagation();
 
     // Move to new folder
-    const updatedNote = { ...noteData, folderId: folderId };
+    const updatedNote = { ...noteData, folderId: noteData.folderId === folderId ? null : folderId };
     setNoteData(updatedNote);
   };
 
@@ -194,13 +192,11 @@ const NewNoteView = () => {
       try {
         const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
         dispatch(setUserNotes(data?.data));
-        setExpandCard(false);
         setNoteData(newNoteInitData);
       } catch (error: any) {
         dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
       }
     } else {
-      setExpandCard(false);
       setNoteData(newNoteInitData);
     }
   };
@@ -230,13 +226,11 @@ const NewNoteView = () => {
     { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder }
   ];
 
-  console.log(noteData);
-
   return (
     <Box>
       <Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box>
+        <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+          <Box flex={1}>
             <TextField
               fullWidth
               size="small"
@@ -249,63 +243,106 @@ const NewNoteView = () => {
               onChange={(event) => handleChangeNoteFields(event)}
             />
           </Box>
+
           <Box>
             <Button size="small" onClick={handleClickClose}>
               Close
             </Button>
+            <Tooltip title={expandActions ? "Hide actions" : "Show actions"}>
+              <IconButton size="small" onClick={handleClickExpand}>
+                {expandActions ? (
+                  <ExpandLessOutlinedIcon fontSize="small" />
+                ) : (
+                  <ExpandMoreOutlinedIcon fontSize="small" />
+                )}
+              </IconButton>
+            </Tooltip>
           </Box>
         </Box>
 
-        <Box
-          mt={0.5}
-          p={0.5}
-          borderRadius={8}
-          bgcolor={(theme) => theme.palette.action.hover}
-          border={(theme) => `1px solid ${theme.palette.divider}`}
-        >
-          <Box display="flex" alignItems="center" gap={0.5}>
-            {actionButtons.map(({ title, Icon, onClick }) => (
-              <Fragment key={title}>
-                <Tooltip title={title}>
-                  <IconButton size="small" onClick={onClick}>
-                    {Icon}
-                  </IconButton>
-                </Tooltip>
-              </Fragment>
-            ))}
+        {expandActions ? (
+          <Box
+            mt={0.5}
+            p={0.5}
+            borderRadius={8}
+            bgcolor={(theme) => theme.palette.action.hover}
+            border={(theme) => `1px solid ${theme.palette.divider}`}
+          >
+            <Box display="flex" alignItems="center" gap={0.5}>
+              {actionButtons.map(({ title, Icon, onClick }) => (
+                <Fragment key={title}>
+                  <Tooltip title={title}>
+                    <IconButton size="small" onClick={onClick}>
+                      {Icon}
+                    </IconButton>
+                  </Tooltip>
+                </Fragment>
+              ))}
 
-            <DatetimePickerPopover
-              open={openDatetimePopover}
-              anchorEl={anchorElDatetimePopover}
-              dueDateTime={null}
-              onClose={handleClickRemindMe}
-              onUpdate={(dueDateTime: Date | null) => handleUpdateReminder(dueDateTime)}
-            />
+              <DatetimePickerPopover
+                open={openDatetimePopover}
+                anchorEl={anchorElDatetimePopover}
+                dueDateTime={null}
+                onClose={handleClickRemindMe}
+                onUpdate={(dueDateTime: Date | null) => handleUpdateReminder(dueDateTime)}
+              />
 
-            <ColorPickerPopover
-              open={openColorPopover}
-              anchorEl={anchorElColorPopover}
-              selectedColor={noteData?.color}
-              onClose={handleClickBgOptions}
-              onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
-            />
+              <ColorPickerPopover
+                open={openColorPopover}
+                anchorEl={anchorElColorPopover}
+                selectedColor={noteData?.color}
+                onClose={handleClickBgOptions}
+                onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
+              />
 
-            <LabelPopover
-              open={openLabelPopover}
-              anchorEl={anchorElLabelPopover}
-              selectedLabels={noteData?.labels}
-              onClose={handleClickAddLabel}
-              onClickOption={handleClickLabelOption}
-            />
+              <LabelPopover
+                open={openLabelPopover}
+                anchorEl={anchorElLabelPopover}
+                selectedLabels={noteData?.labels}
+                onClose={handleClickAddLabel}
+                onClickOption={handleClickLabelOption}
+              />
 
-            <FolderPopover
-              open={openFolderPopover}
-              anchorEl={anchorElFolderPopover}
-              selectedFolderId={noteData?.folderId}
-              onClose={handleClickMoveToFolder}
-              onClickOption={handleClickFolderOption}
-            />
+              <FolderPopover
+                open={openFolderPopover}
+                anchorEl={anchorElFolderPopover}
+                selectedFolderId={noteData?.folderId}
+                onClose={handleClickMoveToFolder}
+                onClickOption={handleClickFolderOption}
+              />
+            </Box>
           </Box>
+        ) : null}
+
+        <Box>
+          {Array.isArray(noteData?.labels) && noteData?.labels.length ? (
+            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.5} mt={1}>
+              {noteData?.labels?.map((labelId) => (
+                <Chip
+                  key={labelId}
+                  label={labelIdAndNameMapping[labelId]}
+                  size="small"
+                  color="default"
+                  variant="outlined"
+                  onDelete={(event) => handleClickRemoveLabel(event, labelId)}
+                />
+              ))}
+            </Box>
+          ) : null}
+
+          {noteData?.dueDateTime && (
+            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.5} mt={1}>
+              <Chip
+                key="dueDateTime"
+                icon={<AccessTimeOutlinedIcon fontSize="small" />}
+                label={noteData?.dueDateTime?.toString()}
+                size="small"
+                color="default"
+                variant="outlined"
+                onDelete={(event) => handleClickRemoveReminder(event)}
+              />
+            </Box>
+          )}
         </Box>
 
         <Box mt={1}>
