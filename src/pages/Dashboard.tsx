@@ -70,6 +70,7 @@ const Dashboard: React.FC = () => {
   const userLabels = useAppSelector((state) => state.user.userLabels);
   const userFolders = useAppSelector((state) => state.user.userFolders);
   const isOpenNoteEditor = useAppSelector((state) => state.note.isOpenNoteEditor);
+  const showMainSidebar = useAppSelector((state) => state.app.showMainSidebar);
 
   const [selectedId, setSelectedId] = useState("home");
 
@@ -249,12 +250,13 @@ const Dashboard: React.FC = () => {
     ActiveIcon: LabelIcon,
     content: (
       <Box>
+        <Box mb={2}>
+          <Typography variant="h6">{name}</Typography>
+          <Typography variant="body2">Notes with {name} label appear here</Typography>
+        </Box>
+
         <NoteList
           notes={userNotes?.filter(({ labels }) => labels && _id && labels.includes(_id))}
-          // emptyState={{
-          //   Icon: <LocalOfferOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-          //   title: `Notes with ${name} label appear here`
-          // }}
           onClickPinNote={handleClickPinNote}
           onClickDeleteNote={handleClickDeleteNote}
           onClickRemindMe={handleClickRemindMe}
@@ -277,12 +279,13 @@ const Dashboard: React.FC = () => {
     ActiveIcon: FolderIcon,
     content: (
       <Box>
+        <Box mb={2}>
+          <Typography variant="h6">{name}</Typography>
+          <Typography variant="body2">Notes with {name} folder appear here</Typography>
+        </Box>
+
         <NoteList
           notes={userNotes?.filter(({ folderId }) => folderId === _id)}
-          // emptyState={{
-          //   Icon: <FolderIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-          //   title: `Notes with ${name} folder appear here`
-          // }}
           onClickPinNote={handleClickPinNote}
           onClickDeleteNote={handleClickDeleteNote}
           onClickRemindMe={handleClickRemindMe}
@@ -356,13 +359,7 @@ const Dashboard: React.FC = () => {
                 />
               </Box>
             </Box>
-          ) : (
-            <SectionEmptyState
-              Icon={<LightbulbOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />}
-              title="Nothing to see yet, why not start a new note?"
-              subtitle="It's time to save some ideas and thoughts of yours"
-            />
-          )}
+          ) : null}
         </Box>
       )
     },
@@ -380,10 +377,6 @@ const Dashboard: React.FC = () => {
 
           <NoteList
             notes={upcomingReminderNotes}
-            // emptyState={{
-            //   Icon: <NotificationsOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-            //   title: "Notes with upcoming reminders appear here"
-            // }}
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
             onClickRemindMe={handleClickRemindMe}
@@ -409,26 +402,18 @@ const Dashboard: React.FC = () => {
             <Typography variant="body2">Your archived notes appear here!</Typography>
           </Box>
 
-          {Array.isArray(archivedNotes) && archivedNotes.length ? (
-            <NoteList
-              notes={archivedNotes}
-              onClickPinNote={handleClickPinNote}
-              onClickDeleteNote={handleClickDeleteNote}
-              onClickRemindMe={handleClickRemindMe}
-              onClickRemoveReminder={handleClickRemoveReminder}
-              onClickBgOptions={handleClickBgOptions}
-              onClickArchive={handleClickArchive}
-              onClickUpdateLabel={handleClickUpdateLabel}
-              onClickCard={handleClickCard}
-              onClickMakeCopy={handleClickMakeCopy}
-            />
-          ) : (
-            <SectionEmptyState
-              Icon={<ArchiveOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />}
-              title="Your archived notes appear here"
-              subtitle="It's time to save some ideas and thoughts of yours"
-            />
-          )}
+          <NoteList
+            notes={archivedNotes}
+            onClickPinNote={handleClickPinNote}
+            onClickDeleteNote={handleClickDeleteNote}
+            onClickRemindMe={handleClickRemindMe}
+            onClickRemoveReminder={handleClickRemoveReminder}
+            onClickBgOptions={handleClickBgOptions}
+            onClickArchive={handleClickArchive}
+            onClickUpdateLabel={handleClickUpdateLabel}
+            onClickCard={handleClickCard}
+            onClickMakeCopy={handleClickMakeCopy}
+          />
         </Box>
       )
     },
@@ -446,10 +431,6 @@ const Dashboard: React.FC = () => {
 
           <NoteList
             notes={archivedNotes}
-            // emptyState={{
-            //   Icon: <DeleteOutlinedIcon color="action" sx={{ fontSize: (theme) => theme.spacing(8) }} />,
-            //   title: "Your deleted notes appear here!"
-            // }}
             onClickPinNote={handleClickPinNote}
             onClickDeleteNote={handleClickDeleteNote}
             onClickRemindMe={handleClickRemindMe}
@@ -506,62 +487,64 @@ const Dashboard: React.FC = () => {
       <Header />
 
       <Box m={2} display="flex" gap={2}>
-        <Box flex={1} maxWidth={240}>
-          <Box mb={1}>
-            <CreateButton />
+        {showMainSidebar ? (
+          <Box flex={1} maxWidth={240}>
+            <Box mb={1}>
+              <CreateButton />
+            </Box>
+
+            <List>
+              {listConfig.map(({ id, text, Icon, ActiveIcon }) => (
+                <ListItem key={id} disablePadding disableGutters dense>
+                  <ListItemButton
+                    selected={selectedId === id}
+                    onClick={() => handleClickListItem(id)}
+                    sx={{ borderRadius: 8 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
+                    </ListItemIcon>
+                    <ListItemText>{text}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+
+            <List>
+              {listConfigFolders.map(({ id, text, Icon, ActiveIcon }) => (
+                <ListItem key={id} disablePadding disableGutters dense>
+                  <ListItemButton
+                    selected={selectedId === id}
+                    onClick={() => handleClickListItem(id)}
+                    sx={{ borderRadius: 8 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
+                    </ListItemIcon>
+                    <ListItemText>{text}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
+
+            <List>
+              {listConfigLabels.map(({ id, text, Icon, ActiveIcon }) => (
+                <ListItem key={id} disablePadding disableGutters dense>
+                  <ListItemButton
+                    selected={selectedId === id}
+                    onClick={() => handleClickListItem(id)}
+                    sx={{ borderRadius: 8 }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 32 }}>
+                      {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
+                    </ListItemIcon>
+                    <ListItemText>{text}</ListItemText>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
           </Box>
-
-          <List>
-            {listConfig.map(({ id, text, Icon, ActiveIcon }) => (
-              <ListItem key={id} disablePadding disableGutters dense>
-                <ListItemButton
-                  selected={selectedId === id}
-                  onClick={() => handleClickListItem(id)}
-                  sx={{ borderRadius: 8 }}
-                >
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
-                  </ListItemIcon>
-                  <ListItemText>{text}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-
-          <List>
-            {listConfigFolders.map(({ id, text, Icon, ActiveIcon }) => (
-              <ListItem key={id} disablePadding disableGutters dense>
-                <ListItemButton
-                  selected={selectedId === id}
-                  onClick={() => handleClickListItem(id)}
-                  sx={{ borderRadius: 8 }}
-                >
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
-                  </ListItemIcon>
-                  <ListItemText>{text}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-
-          <List>
-            {listConfigLabels.map(({ id, text, Icon, ActiveIcon }) => (
-              <ListItem key={id} disablePadding disableGutters dense>
-                <ListItemButton
-                  selected={selectedId === id}
-                  onClick={() => handleClickListItem(id)}
-                  sx={{ borderRadius: 8 }}
-                >
-                  <ListItemIcon sx={{ minWidth: 32 }}>
-                    {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
-                  </ListItemIcon>
-                  <ListItemText>{text}</ListItemText>
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Box>
+        ) : null}
 
         <Box flex={4}>
           <Box borderRadius={6}>

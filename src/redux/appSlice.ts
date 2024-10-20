@@ -4,11 +4,13 @@ import { createSlice } from "@reduxjs/toolkit";
 export interface AppState {
   theme: "light" | "dark";
   snackbarAlertInfo: { isOpen: boolean; severity: AlertColor; message: string };
+  showMainSidebar: boolean;
 }
 
 const initialState: AppState = {
   theme: "light",
-  snackbarAlertInfo: { isOpen: false, severity: "info", message: "" }
+  snackbarAlertInfo: { isOpen: false, severity: "info", message: "" },
+  showMainSidebar: true
 };
 
 export const appSlice = createSlice({
@@ -27,10 +29,13 @@ export const appSlice = createSlice({
     },
     closeSnackbarAlert: (state) => {
       state.snackbarAlertInfo.isOpen = false;
+    },
+    toggleMainSidebar: (state) => {
+      state.showMainSidebar = !state.showMainSidebar;
     }
   }
 });
 
-export const { setTheme, openSnackbarAlert, closeSnackbarAlert } = appSlice.actions;
+export const { setTheme, openSnackbarAlert, closeSnackbarAlert, toggleMainSidebar } = appSlice.actions;
 
 export default appSlice.reducer;

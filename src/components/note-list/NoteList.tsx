@@ -1,5 +1,5 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
-import React, { Fragment } from "react";
+import { Box } from "@mui/material";
+import React from "react";
 import { INote } from "../../pages/Dashboard";
 import { useAppSelector } from "../../redux/hooks";
 import NoteItem from "../note-item/NoteItem";

@@ -6,7 +6,7 @@ import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ViewAgendaOutlinedIcon from "@mui/icons-material/ViewAgendaOutlined";
 import { Avatar, Box, Card, Divider, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { setTheme } from "../../redux/appSlice";
+import { setTheme, toggleMainSidebar } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserPreferences } from "../../redux/userSlice";
 import { StyledLink } from "../styledComponents";
@@ -47,7 +47,7 @@ const Header: React.FC = () => {
       <Box px={2} py={2} display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
         <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
           <Box px={1}>
-            <IconButton size="small">
+            <IconButton size="small" onClick={() => dispatch(toggleMainSidebar())}>
               <MenuOutlinedIcon />
             </IconButton>
           </Box>

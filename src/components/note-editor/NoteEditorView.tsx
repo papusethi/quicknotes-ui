@@ -176,8 +176,13 @@ const NoteEditorView: React.FC = () => {
     ) {
       const newNote = { ...noteData, userId: currentUser?._id };
       try {
-        const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
-        dispatch(setUserNotes(data?.data));
+        if (newNote._id) {
+          const { data } = await axiosInstance.put(`/note/${newNote?._id}`, JSON.stringify(newNote));
+          dispatch(setUserNotes(data?.data));
+        } else {
+          const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
+          dispatch(setUserNotes(data?.data));
+        }
       } catch (error: any) {
         dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
       }
