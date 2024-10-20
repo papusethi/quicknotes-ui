@@ -1,4 +1,3 @@
-import { ArrowBack } from "@mui/icons-material";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
@@ -7,6 +6,7 @@ import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
+import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
 import { Box, Chip, IconButton, TextField, Tooltip } from "@mui/material";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
@@ -23,6 +23,7 @@ import { newNoteInitData } from "../create-note/CreateNote";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
 const NoteEditorView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -168,6 +169,13 @@ const NoteEditorView: React.FC = () => {
     setNoteData(updateNote);
   };
 
+  const handleClickDelete = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+
+    const updateNote = { ...noteData, isDeleted: !noteData.isDeleted };
+    setNoteData(updateNote);
+  };
+
   const handleSaveNote = async () => {
     if (
       noteData.title.trim() ||
@@ -213,24 +221,77 @@ const NoteEditorView: React.FC = () => {
       onClick: handleClickArchive
     },
     { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel },
-    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder }
+    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder },
+    { title: "Delete note", Icon: <DeleteOutlinedIcon fontSize="small" />, onClick: handleClickDelete }
   ];
 
   return (
     <Box>
       <Box
+        p={0.5}
+        borderRadius={2}
+        bgcolor={(theme) => theme.palette.action.hover}
+        border={(theme) => `1px solid ${theme.palette.divider}`}
+      >
+        <Box display="flex" alignItems="center" gap={0.5}>
+          {actionButtons.map(({ title, Icon, onClick }) => (
+            <Fragment key={title}>
+              <Tooltip title={title}>
+                <IconButton size="small" onClick={onClick}>
+                  {Icon}
+                </IconButton>
+              </Tooltip>
+            </Fragment>
+          ))}
+
+          <Tooltip title="Save">
+            <IconButton size="small" onClick={handleClickClose}>
+              <SaveOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <DatetimePickerPopover
+            open={openDatetimePopover}
+            anchorEl={anchorElDatetimePopover}
+            dueDateTime={null}
+            onClose={handleClickRemindMe}
+            onUpdate={(dueDateTime: Date | null) => handleUpdateReminder(dueDateTime)}
+          />
+
+          <ColorPickerPopover
+            open={openColorPopover}
+            anchorEl={anchorElColorPopover}
+            selectedColor={noteData?.color}
+            onClose={handleClickBgOptions}
+            onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
+          />
+
+          <LabelPopover
+            open={openLabelPopover}
+            anchorEl={anchorElLabelPopover}
+            selectedLabels={noteData?.labels}
+            onClose={handleClickAddLabel}
+            onClickOption={handleClickLabelOption}
+          />
+
+          <FolderPopover
+            open={openFolderPopover}
+            anchorEl={anchorElFolderPopover}
+            selectedFolderId={noteData?.folderId}
+            onClose={handleClickMoveToFolder}
+            onClickOption={handleClickFolderOption}
+          />
+        </Box>
+      </Box>
+
+      <Box
+        mt={1}
         p={1.5}
-        borderRadius={4}
+        borderRadius={2}
         bgcolor={(theme) => theme.palette.action.hover}
         border={(theme) => `1px solid ${theme.palette.divider}`}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-          <Tooltip title="Back">
-            <IconButton size="small" onClick={handleClickClose}>
-              <ArrowBack fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
           <Box flex={1}>
             <TextField
               fullWidth
@@ -244,89 +305,36 @@ const NoteEditorView: React.FC = () => {
               onChange={(event) => handleChangeNoteFields(event)}
             />
           </Box>
-
-          <Box
-            p={0.5}
-            borderRadius={8}
-            bgcolor={(theme) => theme.palette.action.hover}
-            border={(theme) => `1px solid ${theme.palette.divider}`}
-          >
-            <Box display="flex" alignItems="center" gap={0.5}>
-              {actionButtons.map(({ title, Icon, onClick }) => (
-                <Fragment key={title}>
-                  <Tooltip title={title}>
-                    <IconButton size="small" onClick={onClick}>
-                      {Icon}
-                    </IconButton>
-                  </Tooltip>
-                </Fragment>
-              ))}
-
-              <DatetimePickerPopover
-                open={openDatetimePopover}
-                anchorEl={anchorElDatetimePopover}
-                dueDateTime={null}
-                onClose={handleClickRemindMe}
-                onUpdate={(dueDateTime: Date | null) => handleUpdateReminder(dueDateTime)}
-              />
-
-              <ColorPickerPopover
-                open={openColorPopover}
-                anchorEl={anchorElColorPopover}
-                selectedColor={noteData?.color}
-                onClose={handleClickBgOptions}
-                onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
-              />
-
-              <LabelPopover
-                open={openLabelPopover}
-                anchorEl={anchorElLabelPopover}
-                selectedLabels={noteData?.labels}
-                onClose={handleClickAddLabel}
-                onClickOption={handleClickLabelOption}
-              />
-
-              <FolderPopover
-                open={openFolderPopover}
-                anchorEl={anchorElFolderPopover}
-                selectedFolderId={noteData?.folderId}
-                onClose={handleClickMoveToFolder}
-                onClickOption={handleClickFolderOption}
-              />
-            </Box>
-          </Box>
         </Box>
 
-        <Box>
-          {Array.isArray(noteData?.labels) && noteData?.labels.length ? (
-            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.5} mt={1}>
-              {noteData?.labels?.map((labelId) => (
-                <Chip
-                  key={labelId}
-                  label={labelIdAndNameMapping[labelId]}
-                  size="small"
-                  color="default"
-                  variant="outlined"
-                  onDelete={(event) => handleClickRemoveLabel(event, labelId)}
-                />
-              ))}
-            </Box>
-          ) : null}
-
-          {noteData?.dueDateTime && (
-            <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.5} mt={1}>
+        {Array.isArray(noteData?.labels) && noteData?.labels.length ? (
+          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.5} mt={1}>
+            {noteData?.labels?.map((labelId) => (
               <Chip
-                key="dueDateTime"
-                icon={<AccessTimeOutlinedIcon fontSize="small" />}
-                label={noteData?.dueDateTime?.toString()}
+                key={labelId}
                 size="small"
                 color="default"
                 variant="outlined"
-                onDelete={(event) => handleClickRemoveReminder(event)}
+                label={labelIdAndNameMapping[labelId]}
+                onDelete={(event) => handleClickRemoveLabel(event, labelId)}
               />
-            </Box>
-          )}
-        </Box>
+            ))}
+          </Box>
+        ) : null}
+
+        {noteData?.dueDateTime && (
+          <Box display="flex" flexDirection="row" flexWrap="wrap" gap={0.5} mt={1}>
+            <Chip
+              key="dueDateTime"
+              size="small"
+              color="default"
+              variant="outlined"
+              icon={<AccessTimeOutlinedIcon fontSize="small" />}
+              label={noteData?.dueDateTime?.toString()}
+              onDelete={(event) => handleClickRemoveReminder(event)}
+            />
+          </Box>
+        )}
 
         <Box mt={1}>
           {noteData.type === "CHECKLIST" ? (

@@ -10,24 +10,21 @@ import HomeIcon from "@mui/icons-material/Home";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import LabelIcon from "@mui/icons-material/Label";
 import LabelOutlinedIcon from "@mui/icons-material/LabelOutlined";
-import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOutlinedIcon from "@mui/icons-material/NotificationsOutlined";
-import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../api/axiosInstance";
-import CreateButton from "../components/create-button/CreateButton";
 import FolderList from "../components/folder-list/FolderList";
 import Header from "../components/header/Header";
 import LabelList from "../components/label-list/LabelList";
 import NoteEditorView from "../components/note-editor/NoteEditorView";
 import NoteList from "../components/note-list/NoteList";
-import SectionEmptyState from "../components/section-empty-state/SectionEmptyState";
-import { openSnackbarAlert } from "../redux/appSlice";
+import SideNavbar from "../components/side-navbar/SideNavbar";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { openNoteEditor, setCurrentNote } from "../redux/noteSlice";
+import { setCurrentNote, setDrawerNotes } from "../redux/noteSlice";
 import { setUserFolders, setUserLabels, setUserNotes } from "../redux/userSlice";
 
 export interface IFolderItem {
@@ -55,11 +52,14 @@ export interface INote {
   labels: null | string[];
   isPinned: boolean;
   isArchived: boolean;
+  isDeleted: boolean;
   color: null | string;
   dueDateTime: null | Date;
   type: "NOTE" | "CHECKLIST";
   tasks: null | ITaskItem[];
   folderId: null | string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -70,9 +70,7 @@ const Dashboard: React.FC = () => {
   const userLabels = useAppSelector((state) => state.user.userLabels);
   const userFolders = useAppSelector((state) => state.user.userFolders);
   const isOpenNoteEditor = useAppSelector((state) => state.note.isOpenNoteEditor);
-  const showMainSidebar = useAppSelector((state) => state.app.showMainSidebar);
-
-  const [selectedId, setSelectedId] = useState("home");
+  const { showSideNavbar, sidebarSelectedId } = useAppSelector((state) => state.app);
 
   const [completedTasks, setCompletedTasks] = useState(new Set());
 
@@ -81,6 +79,8 @@ const Dashboard: React.FC = () => {
       try {
         const { data } = await axiosInstance.get("/note");
         dispatch(setUserNotes(data?.data));
+        dispatch(setDrawerNotes(data?.data));
+        dispatch(setCurrentNote(data?.data?.[0]));
       } catch (error) {
         console.error(error);
       }
@@ -128,117 +128,24 @@ const Dashboard: React.FC = () => {
     };
   }, [completedTasks, userNotes]);
 
-  const handleClickListItem = (newTabId: string) => {
-    setSelectedId(newTabId);
-  };
-
-  const handleClickDeleteNote = async (event: React.MouseEvent<HTMLLIElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-
-    try {
-      const { data } = await axiosInstance.delete(`/note/${note._id}`);
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickPinNote = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-
-    const updateNote = { ...note, isPinned: !note.isPinned };
-    try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickUpdateLabel = async (event: any, note: INote) => {
-    event?.stopPropagation();
-
-    try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(note));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickRemindMe = async (dueDateTime: Date | null, note: INote) => {
-    const updateNote = { ...note, dueDateTime };
-    try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickRemoveReminder = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-    const updateNote = { ...note, dueDateTime: null };
-    try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickBgOptions = async (colorKey: string | null, note: INote) => {
-    const updateNote = { ...note, color: note.color === colorKey ? null : colorKey };
-    try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-    const updateNote = { ...note, isArchived: !note.isArchived };
-    try {
-      const { data } = await axiosInstance.put(`/note/${note?._id}`, JSON.stringify(updateNote));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
-  const handleClickCard = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, note: INote) => {
-    dispatch(openNoteEditor());
-    dispatch(setCurrentNote(note));
-  };
-
-  const handleClickMakeCopy = async (event: React.MouseEvent<HTMLLIElement, MouseEvent>, note: INote) => {
-    event?.stopPropagation();
-    const { _id, ...restNote } = note;
-    const newNote = { ...restNote };
-
-    try {
-      const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
-      dispatch(setUserNotes(data?.data));
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
   const unarchivedNotes: INote[] = [];
   const archivedNotes: INote[] = [];
   const upcomingReminderNotes: INote[] = [];
+  const trashedNotes: INote[] = [];
 
   userNotes?.forEach((note) => {
-    if (note.isArchived) {
-      archivedNotes.push(note);
+    if (note.isDeleted) {
+      trashedNotes.push(note);
     } else {
-      unarchivedNotes.push(note);
-    }
+      if (note.isArchived) {
+        archivedNotes.push(note);
+      } else {
+        unarchivedNotes.push(note);
+      }
 
-    if (note.dueDateTime) {
-      upcomingReminderNotes.push(note);
+      if (note.dueDateTime) {
+        upcomingReminderNotes.push(note);
+      }
     }
   });
 
@@ -250,23 +157,12 @@ const Dashboard: React.FC = () => {
     ActiveIcon: LabelIcon,
     content: (
       <Box>
-        <Box mb={2}>
+        <Box>
           <Typography variant="h6">{name}</Typography>
-          <Typography variant="body2">Notes with {name} label appear here</Typography>
+          <Typography variant="body2">Notes with {name} label appear here!</Typography>
         </Box>
 
-        <NoteList
-          notes={userNotes?.filter(({ labels }) => labels && _id && labels.includes(_id))}
-          onClickPinNote={handleClickPinNote}
-          onClickDeleteNote={handleClickDeleteNote}
-          onClickRemindMe={handleClickRemindMe}
-          onClickRemoveReminder={handleClickRemoveReminder}
-          onClickBgOptions={handleClickBgOptions}
-          onClickArchive={handleClickArchive}
-          onClickUpdateLabel={handleClickUpdateLabel}
-          onClickCard={handleClickCard}
-          onClickMakeCopy={handleClickMakeCopy}
-        />
+        <NoteList notes={userNotes?.filter(({ labels }) => labels && _id && labels.includes(_id))} />
       </Box>
     )
   }));
@@ -279,23 +175,11 @@ const Dashboard: React.FC = () => {
     ActiveIcon: FolderIcon,
     content: (
       <Box>
-        <Box mb={2}>
+        <Box>
           <Typography variant="h6">{name}</Typography>
-          <Typography variant="body2">Notes with {name} folder appear here</Typography>
+          <Typography variant="body2">Notes with {name} folder appear here!</Typography>
         </Box>
-
-        <NoteList
-          notes={userNotes?.filter(({ folderId }) => folderId === _id)}
-          onClickPinNote={handleClickPinNote}
-          onClickDeleteNote={handleClickDeleteNote}
-          onClickRemindMe={handleClickRemindMe}
-          onClickRemoveReminder={handleClickRemoveReminder}
-          onClickBgOptions={handleClickBgOptions}
-          onClickArchive={handleClickArchive}
-          onClickUpdateLabel={handleClickUpdateLabel}
-          onClickCard={handleClickCard}
-          onClickMakeCopy={handleClickMakeCopy}
-        />
+        <NoteList notes={userNotes?.filter(({ folderId }) => folderId === _id)} />
       </Box>
     )
   }));
@@ -308,58 +192,11 @@ const Dashboard: React.FC = () => {
       ActiveIcon: HomeIcon,
       content: (
         <Box>
-          <Box mb={3}>
+          <Box>
             <Typography variant="h6">Welcome home, {currentUser?.username}!</Typography>
+            <Typography variant="body2">Keep all your notes organized here!</Typography>
           </Box>
-
-          {Array.isArray(userFolders) && userFolders.length ? (
-            <Box>
-              <Typography>Recent folders</Typography>
-              <Box my={1} display="grid" gap={2} gridTemplateColumns="repeat(4, 1fr)">
-                {userFolders.map(({ _id, name }) => (
-                  <Box
-                    key={_id}
-                    borderRadius={2}
-                    border="1px solid"
-                    borderColor={(theme) => theme.palette.divider}
-                    paddingY={1}
-                    paddingX={2}
-                    display="flex"
-                    gap={2}
-                    alignItems="center"
-                  >
-                    <FolderIcon fontSize="large" color="action" />
-                    <Box>
-                      <Typography>{name}</Typography>
-                      <Typography variant="body2" color="GrayText">
-                        5 notes
-                      </Typography>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
-          ) : null}
-
-          {Array.isArray(unarchivedNotes) && unarchivedNotes.length ? (
-            <Box mt={3}>
-              <Typography>Recent notes</Typography>
-              <Box mt={1}>
-                <NoteList
-                  notes={unarchivedNotes}
-                  onClickPinNote={handleClickPinNote}
-                  onClickDeleteNote={handleClickDeleteNote}
-                  onClickRemindMe={handleClickRemindMe}
-                  onClickRemoveReminder={handleClickRemoveReminder}
-                  onClickBgOptions={handleClickBgOptions}
-                  onClickArchive={handleClickArchive}
-                  onClickUpdateLabel={handleClickUpdateLabel}
-                  onClickCard={handleClickCard}
-                  onClickMakeCopy={handleClickMakeCopy}
-                />
-              </Box>
-            </Box>
-          ) : null}
+          <NoteList notes={unarchivedNotes} />
         </Box>
       )
     },
@@ -370,23 +207,11 @@ const Dashboard: React.FC = () => {
       ActiveIcon: NotificationsIcon,
       content: (
         <Box>
-          <Box mb={2}>
+          <Box>
             <Typography variant="h6">Reminders</Typography>
             <Typography variant="body2">Notes with upcoming reminders appear here!</Typography>
           </Box>
-
-          <NoteList
-            notes={upcomingReminderNotes}
-            onClickPinNote={handleClickPinNote}
-            onClickDeleteNote={handleClickDeleteNote}
-            onClickRemindMe={handleClickRemindMe}
-            onClickRemoveReminder={handleClickRemoveReminder}
-            onClickBgOptions={handleClickBgOptions}
-            onClickArchive={handleClickArchive}
-            onClickUpdateLabel={handleClickUpdateLabel}
-            onClickCard={handleClickCard}
-            onClickMakeCopy={handleClickMakeCopy}
-          />
+          <NoteList notes={upcomingReminderNotes} />
         </Box>
       )
     },
@@ -397,23 +222,12 @@ const Dashboard: React.FC = () => {
       ActiveIcon: ArchiveIcon,
       content: (
         <Box>
-          <Box mb={2}>
+          <Box>
             <Typography variant="h6">Archived</Typography>
             <Typography variant="body2">Your archived notes appear here!</Typography>
           </Box>
 
-          <NoteList
-            notes={archivedNotes}
-            onClickPinNote={handleClickPinNote}
-            onClickDeleteNote={handleClickDeleteNote}
-            onClickRemindMe={handleClickRemindMe}
-            onClickRemoveReminder={handleClickRemoveReminder}
-            onClickBgOptions={handleClickBgOptions}
-            onClickArchive={handleClickArchive}
-            onClickUpdateLabel={handleClickUpdateLabel}
-            onClickCard={handleClickCard}
-            onClickMakeCopy={handleClickMakeCopy}
-          />
+          <NoteList notes={archivedNotes} />
         </Box>
       )
     },
@@ -424,23 +238,12 @@ const Dashboard: React.FC = () => {
       ActiveIcon: DeleteIcon,
       content: (
         <Box>
-          <Box mb={2}>
+          <Box>
             <Typography variant="h6">Trash</Typography>
             <Typography variant="body2">Your deleted notes appear here!</Typography>
           </Box>
 
-          <NoteList
-            notes={archivedNotes}
-            onClickPinNote={handleClickPinNote}
-            onClickDeleteNote={handleClickDeleteNote}
-            onClickRemindMe={handleClickRemindMe}
-            onClickRemoveReminder={handleClickRemoveReminder}
-            onClickBgOptions={handleClickBgOptions}
-            onClickArchive={handleClickArchive}
-            onClickUpdateLabel={handleClickUpdateLabel}
-            onClickCard={handleClickCard}
-            onClickMakeCopy={handleClickMakeCopy}
-          />
+          <NoteList notes={trashedNotes} />
         </Box>
       )
     }
@@ -487,79 +290,26 @@ const Dashboard: React.FC = () => {
       <Header />
 
       <Box m={2} display="flex" gap={2}>
-        {showMainSidebar ? (
-          <Box flex={1} maxWidth={240}>
-            <Box mb={1}>
-              <CreateButton />
-            </Box>
-
-            <List>
-              {listConfig.map(({ id, text, Icon, ActiveIcon }) => (
-                <ListItem key={id} disablePadding disableGutters dense>
-                  <ListItemButton
-                    selected={selectedId === id}
-                    onClick={() => handleClickListItem(id)}
-                    sx={{ borderRadius: 8 }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 32 }}>
-                      {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
-                    </ListItemIcon>
-                    <ListItemText>{text}</ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-
-            <List>
-              {listConfigFolders.map(({ id, text, Icon, ActiveIcon }) => (
-                <ListItem key={id} disablePadding disableGutters dense>
-                  <ListItemButton
-                    selected={selectedId === id}
-                    onClick={() => handleClickListItem(id)}
-                    sx={{ borderRadius: 8 }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 32 }}>
-                      {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
-                    </ListItemIcon>
-                    <ListItemText>{text}</ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-
-            <List>
-              {listConfigLabels.map(({ id, text, Icon, ActiveIcon }) => (
-                <ListItem key={id} disablePadding disableGutters dense>
-                  <ListItemButton
-                    selected={selectedId === id}
-                    onClick={() => handleClickListItem(id)}
-                    sx={{ borderRadius: 8 }}
-                  >
-                    <ListItemIcon sx={{ minWidth: 32 }}>
-                      {selectedId === id ? <ActiveIcon fontSize="small" color="primary" /> : <Icon fontSize="small" />}
-                    </ListItemIcon>
-                    <ListItemText>{text}</ListItemText>
-                  </ListItemButton>
-                </ListItem>
-              ))}
-            </List>
-          </Box>
+        {showSideNavbar ? (
+          <SideNavbar
+            listConfig={listConfig}
+            listConfigFolders={listConfigFolders}
+            listConfigLabels={listConfigLabels}
+          />
         ) : null}
 
-        <Box flex={4}>
-          <Box borderRadius={6}>
-            {isOpenNoteEditor ? (
-              <Box>
-                <NoteEditorView />
-              </Box>
-            ) : (
-              <Box>
-                {listConfig?.find((item) => item.id === selectedId)?.content ?? null}
-                {listConfigFolders?.find((item) => item.id === selectedId)?.content ?? null}
-                {listConfigLabels?.find((item) => item.id === selectedId)?.content ?? null}
-              </Box>
-            )}
-          </Box>
+        <Box flex={1} maxWidth={300}>
+          {listConfig?.find((item) => item.id === sidebarSelectedId)?.content ?? null}
+          {listConfigFolders?.find((item) => item.id === sidebarSelectedId)?.content ?? null}
+          {listConfigLabels?.find((item) => item.id === sidebarSelectedId)?.content ?? null}
+        </Box>
+
+        <Box flex={3} borderRadius={6}>
+          {isOpenNoteEditor ? (
+            <Box>
+              <NoteEditorView />
+            </Box>
+          ) : null}
         </Box>
       </Box>
     </Box>

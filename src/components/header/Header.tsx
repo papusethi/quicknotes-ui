@@ -2,11 +2,10 @@ import DarkModeIcon from "@mui/icons-material/DarkMode";
 import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ViewAgendaOutlinedIcon from "@mui/icons-material/ViewAgendaOutlined";
-import { Avatar, Box, Card, Divider, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import { Avatar, Box, Divider, IconButton, Tooltip, Typography } from "@mui/material";
 import React from "react";
-import { setTheme, toggleMainSidebar } from "../../redux/appSlice";
+import { setTheme, toggleSideNavbar } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { setUserPreferences } from "../../redux/userSlice";
 import { StyledLink } from "../styledComponents";
@@ -47,7 +46,7 @@ const Header: React.FC = () => {
       <Box px={2} py={2} display="flex" flexDirection="row" justifyContent="space-between" alignItems="center">
         <Box display="flex" justifyContent="space-between" alignItems="center" gap={2}>
           <Box px={1}>
-            <IconButton size="small" onClick={() => dispatch(toggleMainSidebar())}>
+            <IconButton size="small" onClick={() => dispatch(toggleSideNavbar())}>
               <MenuOutlinedIcon />
             </IconButton>
           </Box>
@@ -60,7 +59,7 @@ const Header: React.FC = () => {
           </Box>
         </Box>
 
-        <Box flex={1} maxWidth={480}>
+        {/* <Box flex={1} maxWidth={480}>
           <Card variant="outlined" elevation={0}>
             <Box px={1} py={0.5}>
               <TextField
@@ -75,7 +74,7 @@ const Header: React.FC = () => {
               />
             </Box>
           </Card>
-        </Box>
+        </Box> */}
 
         <Box display="flex" alignItems="center" gap={1}>
           <Tooltip title={appTheme === "dark" ? "Light mode" : "Dark mode"}>

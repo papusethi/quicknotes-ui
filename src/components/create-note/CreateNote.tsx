@@ -39,6 +39,7 @@ export const newNoteInitData: INote = {
   labels: null,
   isPinned: false,
   isArchived: false,
+  isDeleted: false,
   color: null,
   dueDateTime: null,
   type: "NOTE",
@@ -90,13 +91,13 @@ const CreateNote: React.FC = () => {
 
   const handleClickCard = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     setExpandCard(true);
-    setNoteData({ ...newNoteInitData, type: "NOTE" });
+    setNoteData({ ...newNoteInitData, type: "NOTE", _id: "new-draft-note" });
   };
 
   const handleClickChecklist = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.stopPropagation();
     setExpandCard(true);
-    setNoteData({ ...newNoteInitData, type: "CHECKLIST" });
+    setNoteData({ ...newNoteInitData, type: "CHECKLIST", _id: "new-draft-note" });
   };
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement>) => {
