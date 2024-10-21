@@ -1,14 +1,17 @@
+import { FolderOpen, History, Home } from "@mui/icons-material";
 import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
 import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
-import { Box, Chip, IconButton, TextField, Tooltip } from "@mui/material";
+import { Box, Chip, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import moment from "moment";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
 import { INote, ITaskItem } from "../../pages/Dashboard";
@@ -23,14 +26,13 @@ import { newNoteInitData } from "../create-note/CreateNote";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 
 const NoteEditorView: React.FC = () => {
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector((state) => state.user.currentUser);
   const currentNote = useAppSelector((state) => state.note.currentNote);
-
+  const userFolders = useAppSelector((state) => state.user.userFolders);
   const userLabels = useAppSelector((state) => state.user.userLabels);
 
   const [noteData, setNoteData] = useState<INote>(newNoteInitData);
@@ -60,12 +62,6 @@ const NoteEditorView: React.FC = () => {
       return acc;
     }, {} as Record<string, string>);
   }, [userLabels]);
-
-  const handleClickClose = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event.stopPropagation();
-    await handleSaveNote();
-    dispatch(closeNoteEditor());
-  };
 
   const handleChangeNoteFields = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -176,7 +172,7 @@ const NoteEditorView: React.FC = () => {
     setNoteData(updateNote);
   };
 
-  const handleSaveNote = async () => {
+  const saveNote = async () => {
     if (
       noteData.title.trim() ||
       noteData.description.trim() ||
@@ -197,6 +193,10 @@ const NoteEditorView: React.FC = () => {
     } else {
       setNoteData(newNoteInitData);
     }
+  };
+
+  const handleClickSaveNote = async () => {
+    await saveNote();
   };
 
   const actionButtons = [
@@ -221,9 +221,22 @@ const NoteEditorView: React.FC = () => {
       onClick: handleClickArchive
     },
     { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel },
-    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder },
-    { title: "Delete note", Icon: <DeleteOutlinedIcon fontSize="small" />, onClick: handleClickDelete }
+    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder }
   ];
+
+  // User folder id and folder name mapping for easier to display in note.
+  const folderIdAndNameMapping = useMemo(() => {
+    return userFolders.reduce((acc, eachFolder) => {
+      if (eachFolder._id) {
+        acc[eachFolder._id] = eachFolder.name;
+      }
+      return acc;
+    }, {} as Record<string, string>);
+  }, [userFolders]);
+
+  const updatedAtValue = currentNote?.updatedAt
+    ? moment(currentNote?.updatedAt).format("MMMM Do YYYY, h:mm:ss a")
+    : null;
 
   return (
     <Box>
@@ -232,8 +245,11 @@ const NoteEditorView: React.FC = () => {
         borderRadius={2}
         bgcolor={(theme) => theme.palette.action.hover}
         border={(theme) => `1px solid ${theme.palette.divider}`}
+        display="flex"
+        alignItems="center"
+        justifySelf="space-between"
       >
-        <Box display="flex" alignItems="center" gap={0.5}>
+        <Box width="100%" display="flex" alignItems="center" gap={0.5}>
           {actionButtons.map(({ title, Icon, onClick }) => (
             <Fragment key={title}>
               <Tooltip title={title}>
@@ -243,12 +259,6 @@ const NoteEditorView: React.FC = () => {
               </Tooltip>
             </Fragment>
           ))}
-
-          <Tooltip title="Save">
-            <IconButton size="small" onClick={handleClickClose}>
-              <SaveOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
 
           <DatetimePickerPopover
             open={openDatetimePopover}
@@ -282,6 +292,20 @@ const NoteEditorView: React.FC = () => {
             onClickOption={handleClickFolderOption}
           />
         </Box>
+
+        <Box justifySelf="flex-end" display="flex" alignItems="center" gap={0.5}>
+          <Tooltip title="Save">
+            <IconButton size="small" onClick={handleClickSaveNote}>
+              <SaveOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Move to trash">
+            <IconButton size="small" onClick={handleClickDelete}>
+              <DeleteOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Box>
       </Box>
 
       <Box
@@ -291,8 +315,35 @@ const NoteEditorView: React.FC = () => {
         bgcolor={(theme) => theme.palette.action.hover}
         border={(theme) => `1px solid ${theme.palette.divider}`}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
-          <Box flex={1}>
+        <Box>
+          <Box mb={1} display="flex" alignItems="center" gap={0.25} justifyContent="space-between">
+            {currentNote?.folderId ? (
+              <Box display="flex" alignItems="center" gap={0.25}>
+                <FolderOpen color="action" sx={{ fontSize: 16 }} />
+                <Typography variant="caption" lineHeight={1}>
+                  {folderIdAndNameMapping[currentNote?.folderId]}
+                </Typography>
+              </Box>
+            ) : (
+              <Box display="flex" alignItems="center" gap={0.25}>
+                <Home color="action" sx={{ fontSize: 16 }} />
+                <Typography variant="caption" lineHeight={1}>
+                  Home
+                </Typography>
+              </Box>
+            )}
+
+            {updatedAtValue ? (
+              <Box display="flex" alignItems="center" gap={0.25}>
+                <History color="action" sx={{ fontSize: 16 }} />
+                <Typography variant="caption" lineHeight={1}>
+                  {updatedAtValue}
+                </Typography>
+              </Box>
+            ) : null}
+          </Box>
+
+          <Box>
             <TextField
               fullWidth
               size="small"

@@ -18,8 +18,6 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
   const currentNote = useAppSelector((state) => state.note.currentNote);
   const userFolders = useAppSelector((state) => state.user.userFolders);
 
-  const updatedOnValue = note?.updatedAt ? moment(note?.updatedAt).format("dddd") : null;
-
   // User folder id and folder name mapping for easier to display in note.
   const folderIdAndNameMapping = useMemo(() => {
     return userFolders.reduce((acc, eachFolder) => {
@@ -29,6 +27,8 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
       return acc;
     }, {} as Record<string, string>);
   }, [userFolders]);
+
+  const updatedAtValue = note?.updatedAt ? moment(note?.updatedAt).format("dddd") : null;
 
   return (
     <ListItem disableGutters divider>
@@ -71,11 +71,11 @@ const NoteItem: React.FC<INoteItemProps> = (props) => {
               </Box>
             )}
 
-            {updatedOnValue ? (
+            {updatedAtValue ? (
               <Box display="flex" alignItems="center" gap={0.25}>
                 <History color="action" fontSize="small" sx={{ fontSize: 16 }} />
                 <Typography variant="caption" lineHeight={1}>
-                  {updatedOnValue}
+                  {updatedAtValue}
                 </Typography>
               </Box>
             ) : null}
