@@ -4,6 +4,7 @@ import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import PushPinIcon from "@mui/icons-material/PushPin";
@@ -17,7 +18,6 @@ import { axiosInstance } from "../../api/axiosInstance";
 import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { closeNoteEditor } from "../../redux/noteSlice";
 import { setUserNotes } from "../../redux/userSlice";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
@@ -165,6 +165,24 @@ const NoteEditorView: React.FC = () => {
     setNoteData(updateNote);
   };
 
+  const handleClickMakeCopy = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+
+    if (
+      currentNote?.title.trim() ||
+      currentNote?.description.trim() ||
+      (Array.isArray(currentNote?.tasks) && currentNote?.tasks.length)
+    ) {
+      const newNote = { ...currentNote, userId: currentUser?._id };
+      try {
+        const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
+        dispatch(setUserNotes(data?.data));
+      } catch (error: any) {
+        dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+      }
+    }
+  };
+
   const handleClickDelete = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
 
@@ -221,7 +239,8 @@ const NoteEditorView: React.FC = () => {
       onClick: handleClickArchive
     },
     { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel },
-    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder }
+    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder },
+    { title: "Make a copy", Icon: <FileCopyOutlinedIcon fontSize="small" />, onClick: handleClickMakeCopy }
   ];
 
   // User folder id and folder name mapping for easier to display in note.
