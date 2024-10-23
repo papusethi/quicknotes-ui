@@ -34,7 +34,7 @@ import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
 
 export const newNoteInitData: INote = {
-  title: "",
+  title: "Untitled note",
   description: "",
   labels: null,
   isPinned: false,
