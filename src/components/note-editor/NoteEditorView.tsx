@@ -4,6 +4,7 @@ import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
 import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
@@ -26,6 +27,7 @@ import { newNoteInitData } from "../create-note/CreateNote";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
+import { closeNoteEditor, setCurrentNote } from "../../redux/noteSlice";
 
 const NoteEditorView: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -190,6 +192,22 @@ const NoteEditorView: React.FC = () => {
     setNoteData(updateNote);
   };
 
+  const handleClickDeleteForever = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event?.stopPropagation();
+
+    try {
+      if (noteData?._id) {
+        const { data } = await axiosInstance.delete(`/note/${noteData?._id}`);
+        dispatch(setUserNotes(data?.data));
+      }
+
+      dispatch(setCurrentNote(null));
+      dispatch(closeNoteEditor());
+    } catch (error: any) {
+      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
+    }
+  };
+
   const saveNote = async () => {
     if (
       noteData.title.trim() ||
@@ -322,6 +340,12 @@ const NoteEditorView: React.FC = () => {
           <Tooltip title="Move to trash">
             <IconButton size="small" onClick={handleClickDelete}>
               <DeleteOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+
+          <Tooltip title="Delete forever">
+            <IconButton size="small" onClick={handleClickDeleteForever}>
+              <DeleteForeverOutlinedIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>
