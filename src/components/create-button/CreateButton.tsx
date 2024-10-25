@@ -3,7 +3,7 @@ import { Fab, Menu, MenuItem } from "@mui/material";
 import React, { Fragment, useState } from "react";
 import { useAppDispatch } from "../../redux/hooks";
 import { openNoteEditor, setCurrentNote } from "../../redux/noteSlice";
-import { newNoteInitData } from "../create-note/CreateNote";
+import { newNoteInitData } from "../../utils/constants";
 
 const CreateButton: React.FC = () => {
   const dispatch = useAppDispatch();

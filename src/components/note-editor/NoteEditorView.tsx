@@ -3,8 +3,8 @@ import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
 import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
 import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
 import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
+import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
 import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
 import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
 import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
@@ -19,15 +19,15 @@ import { axiosInstance } from "../../api/axiosInstance";
 import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { closeNoteEditor, setCurrentNote } from "../../redux/noteSlice";
 import { setUserNotes } from "../../redux/userSlice";
+import { newNoteInitData } from "../../utils/constants";
 import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
-import { newNoteInitData } from "../create-note/CreateNote";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
 import FolderPopover from "../folder-popover/FolderPopover";
 import LabelPopover from "../label-popover/LabelPopover";
-import { closeNoteEditor, setCurrentNote } from "../../redux/noteSlice";
 
 const NoteEditorView: React.FC = () => {
   const dispatch = useAppDispatch();
