@@ -2,7 +2,6 @@ import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import KeyboardReturnOutlinedIcon from "@mui/icons-material/KeyboardReturnOutlined";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
 import {
   Box,
   Divider,
@@ -169,8 +168,7 @@ const LabelList: React.FC = () => {
               variant="standard"
               placeholder="Enter label name"
               InputProps={{
-                disableUnderline: true,
-                startAdornment: <LocalOfferOutlinedIcon color="action" sx={{ mr: 0.5 }} />
+                disableUnderline: true
               }}
               value={newLabelName}
               onChange={handleChange}

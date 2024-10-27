@@ -1,7 +1,10 @@
 import { Box, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from "@mui/material";
+import { useState } from "react";
 import CreateButton from "../../components/create-button/CreateButton";
 import { setSidebarSelectedId } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import ManageFolders from "../manage-folders/ManageFolders";
+import ManageLabels from "../manage-labels/ManageLabels";
 
 interface ISideNavbarProps {
   listConfig: any[];
@@ -16,8 +19,17 @@ const SideNavbar: React.FC<ISideNavbarProps> = (props) => {
 
   const sidebarSelectedId = useAppSelector((state) => state.app.sidebarSelectedId);
 
+  const [openManageFolders, setOpenManageFolders] = useState(false);
+  const [openManageLabels, setOpenManageLabels] = useState(false);
+
   const handleClickListItem = (newTabId: string) => {
-    dispatch(setSidebarSelectedId(newTabId));
+    if (newTabId === "manageFolders") {
+      setOpenManageFolders(true);
+    } else if (newTabId === "manageLabels") {
+      setOpenManageLabels(true);
+    } else {
+      dispatch(setSidebarSelectedId(newTabId));
+    }
   };
 
   return (
@@ -76,6 +88,9 @@ const SideNavbar: React.FC<ISideNavbarProps> = (props) => {
           </ListItem>
         ))}
       </List>
+
+      <ManageFolders open={openManageFolders} onClose={() => setOpenManageFolders(false)} />
+      <ManageLabels open={openManageLabels} onClose={() => setOpenManageLabels(false)} />
     </Box>
   );
 };

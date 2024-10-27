@@ -1,5 +1,4 @@
 import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
-import StyleOutlinedIcon from "@mui/icons-material/StyleOutlined";
 import { ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
 import React from "react";
 import { useAppSelector } from "../../redux/hooks";
@@ -31,7 +30,6 @@ const LabelPopover: React.FC<ILabelPopoverProps> = (props) => {
       {userLabels.map(({ _id, name }, index) => (
         <MenuItem
           key={_id}
-          divider={userLabels.length === index + 1}
           onClick={(event) => {
             event?.stopPropagation();
             onClickOption(event, _id);
@@ -45,19 +43,6 @@ const LabelPopover: React.FC<ILabelPopoverProps> = (props) => {
           <ListItemText primaryTypographyProps={{ variant: "body2" }}>{name}</ListItemText>
         </MenuItem>
       ))}
-
-      <MenuItem
-        key="manage-labels"
-        onClick={(event) => {
-          event?.stopPropagation();
-          onClose();
-        }}
-      >
-        <ListItemIcon>
-          <StyleOutlinedIcon fontSize="small" />
-        </ListItemIcon>
-        <ListItemText primaryTypographyProps={{ variant: "body2" }}>Manage labels</ListItemText>
-      </MenuItem>
     </Menu>
   );
 };

@@ -1,28 +1,22 @@
-import { FolderOpen, History, Home } from "@mui/icons-material";
-import AccessTimeOutlinedIcon from "@mui/icons-material/AccessTimeOutlined";
-import AddAlertOutlinedIcon from "@mui/icons-material/AddAlertOutlined";
-import ArchiveOutlinedIcon from "@mui/icons-material/ArchiveOutlined";
-import ColorLensOutlinedIcon from "@mui/icons-material/ColorLensOutlined";
-import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
-import DeleteOutlinedIcon from "@mui/icons-material/DeleteOutlined";
-import FileCopyOutlinedIcon from "@mui/icons-material/FileCopyOutlined";
-import FolderOutlinedIcon from "@mui/icons-material/FolderOutlined";
-import LocalOfferOutlinedIcon from "@mui/icons-material/LocalOfferOutlined";
-import PushPinIcon from "@mui/icons-material/PushPin";
-import PushPinOutlinedIcon from "@mui/icons-material/PushPinOutlined";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
-import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
-import { Box, Chip, IconButton, TextField, Tooltip, Typography } from "@mui/material";
+import {
+  AccessTimeOutlined,
+  AddAlertOutlined,
+  DriveFileMoveOutlined,
+  FolderOpen,
+  History,
+  Home,
+  LocalOfferOutlined,
+  SaveOutlined
+} from "@mui/icons-material";
+import { Box, Button, Chip, IconButton, TextField, Tooltip, Typography } from "@mui/material";
 import moment from "moment";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
 import { axiosInstance } from "../../api/axiosInstance";
 import { INote, ITaskItem } from "../../pages/Dashboard";
 import { openSnackbarAlert } from "../../redux/appSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { closeNoteEditor, setCurrentNote } from "../../redux/noteSlice";
 import { setUserNotes } from "../../redux/userSlice";
 import { newNoteInitData } from "../../utils/constants";
-import ColorPickerPopover from "../color-picker-popover/ColorPickerPopover";
 import ContentChecklistView from "../content-checklist-view/ContentChecklistView";
 import ContentNoteView from "../content-note-view/ContentNoteView";
 import DatetimePickerPopover from "../datetime-picker-popover/DatetimePickerPopover";
@@ -42,9 +36,6 @@ const NoteEditorView: React.FC = () => {
   useEffect(() => {
     setNoteData(currentNote ?? newNoteInitData);
   }, [currentNote]);
-
-  const [openColorPopover, setOpenColorPopover] = useState(false);
-  const [anchorElColorPopover, setAnchorElColorPopover] = useState<null | Element>(null);
 
   const [openLabelPopover, setOpenLabelPopover] = useState(false);
   const [anchorElLabelPopover, setAnchorElLabelPopover] = useState<null | Element>(null);
@@ -76,12 +67,6 @@ const NoteEditorView: React.FC = () => {
     setNoteData(updateNote);
   };
 
-  const handleClickPinNote = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event?.stopPropagation();
-    const updateNote = { ...noteData, isPinned: !noteData.isPinned };
-    setNoteData(updateNote);
-  };
-
   const handleClickRemindMe = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event?.stopPropagation();
     setOpenDatetimePopover((prev) => !prev);
@@ -97,12 +82,6 @@ const NoteEditorView: React.FC = () => {
     event.stopPropagation();
     const updateNote = { ...noteData, dueDateTime: null };
     setNoteData(updateNote);
-  };
-
-  const handleClickBgOptions = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event?.stopPropagation();
-    setOpenColorPopover((prev) => !prev);
-    setAnchorElColorPopover(anchorElColorPopover ? null : event.currentTarget);
   };
 
   const handleClickAddLabel = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -155,59 +134,6 @@ const NoteEditorView: React.FC = () => {
     setNoteData(updatedNote);
   };
 
-  const handleClickNoteColor = (colorValue: string) => {
-    const updateNote = { ...noteData, color: noteData.color === colorValue ? null : colorValue };
-    setNoteData(updateNote);
-  };
-
-  const handleClickArchive = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event?.stopPropagation();
-
-    const updateNote = { ...noteData, isArchived: !noteData.isArchived };
-    setNoteData(updateNote);
-  };
-
-  const handleClickMakeCopy = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event?.stopPropagation();
-
-    if (
-      currentNote?.title.trim() ||
-      currentNote?.description.trim() ||
-      (Array.isArray(currentNote?.tasks) && currentNote?.tasks.length)
-    ) {
-      const newNote = { ...currentNote, userId: currentUser?._id };
-      try {
-        const { data } = await axiosInstance.post("/note", JSON.stringify(newNote));
-        dispatch(setUserNotes(data?.data));
-      } catch (error: any) {
-        dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-      }
-    }
-  };
-
-  const handleClickDelete = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event?.stopPropagation();
-
-    const updateNote = { ...noteData, isDeleted: !noteData.isDeleted };
-    setNoteData(updateNote);
-  };
-
-  const handleClickDeleteForever = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    event?.stopPropagation();
-
-    try {
-      if (noteData?._id) {
-        const { data } = await axiosInstance.delete(`/note/${noteData?._id}`);
-        dispatch(setUserNotes(data?.data));
-      }
-
-      dispatch(setCurrentNote(null));
-      dispatch(closeNoteEditor());
-    } catch (error: any) {
-      dispatch(openSnackbarAlert({ severity: "error", message: error?.message }));
-    }
-  };
-
   const saveNote = async () => {
     if (
       noteData.title.trim() ||
@@ -236,29 +162,9 @@ const NoteEditorView: React.FC = () => {
   };
 
   const actionButtons = [
-    {
-      title: noteData?.isPinned ? "Unpin note" : "Pin note",
-      Icon: noteData?.isPinned ? (
-        <PushPinIcon fontSize="small" sx={{ transform: "rotate(45deg)" }} />
-      ) : (
-        <PushPinOutlinedIcon fontSize="small" />
-      ),
-      onClick: handleClickPinNote
-    },
-    { title: "Remind me", Icon: <AddAlertOutlinedIcon fontSize="small" />, onClick: handleClickRemindMe },
-    { title: "Background options", Icon: <ColorLensOutlinedIcon fontSize="small" />, onClick: handleClickBgOptions },
-    {
-      title: noteData?.isArchived ? "Unarchive" : "Archive",
-      Icon: noteData?.isArchived ? (
-        <UnarchiveOutlinedIcon fontSize="small" />
-      ) : (
-        <ArchiveOutlinedIcon fontSize="small" />
-      ),
-      onClick: handleClickArchive
-    },
-    { title: "Add label", Icon: <LocalOfferOutlinedIcon fontSize="small" />, onClick: handleClickAddLabel },
-    { title: "Move to folder", Icon: <FolderOutlinedIcon fontSize="small" />, onClick: handleClickMoveToFolder },
-    { title: "Make a copy", Icon: <FileCopyOutlinedIcon fontSize="small" />, onClick: handleClickMakeCopy }
+    { title: "Remind me", Icon: <AddAlertOutlined fontSize="small" />, onClick: handleClickRemindMe },
+    { title: "Add label", Icon: <LocalOfferOutlined fontSize="small" />, onClick: handleClickAddLabel },
+    { title: "Move to folder", Icon: <DriveFileMoveOutlined fontSize="small" />, onClick: handleClickMoveToFolder }
   ];
 
   // User folder id and folder name mapping for easier to display in note.
@@ -305,14 +211,6 @@ const NoteEditorView: React.FC = () => {
             onUpdate={(dueDateTime: Date | null) => handleUpdateReminder(dueDateTime)}
           />
 
-          <ColorPickerPopover
-            open={openColorPopover}
-            anchorEl={anchorElColorPopover}
-            selectedColor={noteData?.color}
-            onClose={handleClickBgOptions}
-            onUpdate={(colorKey: string) => handleClickNoteColor(colorKey)}
-          />
-
           <LabelPopover
             open={openLabelPopover}
             anchorEl={anchorElLabelPopover}
@@ -331,23 +229,15 @@ const NoteEditorView: React.FC = () => {
         </Box>
 
         <Box justifySelf="flex-end" display="flex" alignItems="center" gap={0.5}>
-          <Tooltip title="Save">
-            <IconButton size="small" onClick={handleClickSaveNote}>
-              <SaveOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Move to trash">
-            <IconButton size="small" onClick={handleClickDelete}>
-              <DeleteOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip title="Delete forever">
-            <IconButton size="small" onClick={handleClickDeleteForever}>
-              <DeleteForeverOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          <Button
+            size="small"
+            variant="contained"
+            disableElevation
+            startIcon={<SaveOutlined fontSize="small" />}
+            onClick={handleClickSaveNote}
+          >
+            Save
+          </Button>
         </Box>
       </Box>
 
@@ -423,7 +313,7 @@ const NoteEditorView: React.FC = () => {
               size="small"
               color="default"
               variant="outlined"
-              icon={<AccessTimeOutlinedIcon fontSize="small" />}
+              icon={<AccessTimeOutlined fontSize="small" />}
               label={noteData?.dueDateTime?.toString()}
               onDelete={(event) => handleClickRemoveReminder(event)}
             />
