@@ -6,21 +6,12 @@ import { useAppSelector } from "../redux/hooks";
 const ReminderSection = () => {
   const userNotes = useAppSelector((state) => state.user.userNotes);
 
-  const unarchivedNotes: INote[] = [];
-  const archivedNotes: INote[] = [];
   const upcomingReminderNotes: INote[] = [];
-  const trashedNotes: INote[] = [];
 
   userNotes?.forEach((note) => {
-    if (note.isDeleted) {
-      trashedNotes.push(note);
+    if (note.isDeleted || note.isArchived) {
+      // do nothing.
     } else {
-      if (note.isArchived) {
-        archivedNotes.push(note);
-      } else {
-        unarchivedNotes.push(note);
-      }
-
       if (note.dueDateTime) {
         upcomingReminderNotes.push(note);
       }

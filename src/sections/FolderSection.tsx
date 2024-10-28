@@ -4,36 +4,29 @@ import NoteList from "../components/note-list/NoteList";
 import { INote } from "../pages/Dashboard";
 import { useAppSelector } from "../redux/hooks";
 
-interface IHomeSection {
+interface IFolderSectionProps {
   id: string;
   name: string;
 }
 
-const FolderSection: React.FC<IHomeSection> = (props) => {
+const FolderSection: React.FC<IFolderSectionProps> = (props) => {
   const { id, name } = props;
 
   const userNotes = useAppSelector((state) => state.user.userNotes);
 
-  const unarchivedNotes: INote[] = [];
-  const archivedNotes: INote[] = [];
-  const upcomingReminderNotes: INote[] = [];
-  const trashedNotes: INote[] = [];
+  const filteredNotes: INote[] = [];
 
-  userNotes?.forEach((note) => {
-    if (note.isDeleted) {
-      trashedNotes.push(note);
-    } else {
-      if (note.isArchived) {
-        archivedNotes.push(note);
+  if (id && userNotes.length) {
+    userNotes?.forEach((note) => {
+      if (note.isDeleted || note.isArchived) {
+        // do nothing.
       } else {
-        unarchivedNotes.push(note);
+        if (note.folderId && note.folderId === id) {
+          filteredNotes.push(note);
+        }
       }
-
-      if (note.dueDateTime) {
-        upcomingReminderNotes.push(note);
-      }
-    }
-  });
+    });
+  }
 
   return (
     <Box>

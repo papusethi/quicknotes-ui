@@ -4,36 +4,29 @@ import NoteList from "../components/note-list/NoteList";
 import { INote } from "../pages/Dashboard";
 import { useAppSelector } from "../redux/hooks";
 
-interface IHomeSection {
+interface ILabelSectionProps {
   id: string;
   name: string;
 }
 
-const LabelSection: React.FC<IHomeSection> = (props) => {
+const LabelSection: React.FC<ILabelSectionProps> = (props) => {
   const { id, name } = props;
 
   const userNotes = useAppSelector((state) => state.user.userNotes);
 
-  const unarchivedNotes: INote[] = [];
-  const archivedNotes: INote[] = [];
-  const upcomingReminderNotes: INote[] = [];
-  const trashedNotes: INote[] = [];
+  const filteredNotes: INote[] = [];
 
-  userNotes?.forEach((note) => {
-    if (note.isDeleted) {
-      trashedNotes.push(note);
-    } else {
-      if (note.isArchived) {
-        archivedNotes.push(note);
+  if (id && userNotes.length) {
+    userNotes?.forEach((note) => {
+      if (note.isDeleted || note.isArchived) {
+        // do nothing.
       } else {
-        unarchivedNotes.push(note);
+        if (note.labels && note.labels.includes(id)) {
+          filteredNotes.push(note);
+        }
       }
-
-      if (note.dueDateTime) {
-        upcomingReminderNotes.push(note);
-      }
-    }
-  });
+    });
+  }
 
   return (
     <Box>
@@ -42,7 +35,7 @@ const LabelSection: React.FC<IHomeSection> = (props) => {
         <Typography variant="body2">Notes with {name} label appear here!</Typography>
       </Box>
 
-      <NoteList notes={userNotes?.filter(({ labels }) => labels && id && labels.includes(id))} />
+      <NoteList notes={filteredNotes} />
     </Box>
   );
 };
