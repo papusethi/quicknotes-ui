@@ -10,7 +10,7 @@ const AboutUs: React.FC = () => {
           <Box textAlign="center">
             <StyledLink to="/#">
               <Typography variant="h4" display="inline-block">
-                QuikNotes
+                QuickNotes
               </Typography>
             </StyledLink>
             <Typography variant="body2" textAlign="center">
@@ -22,12 +22,12 @@ const AboutUs: React.FC = () => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="h5" mb={2}>
-                  About QuikNote
+                  About QuickNote
                 </Typography>
                 <Box mb={2}>
                   <Typography variant="body2">
                     <Typography component="span" variant="inherit" fontWeight={600}>
-                      QuikNote{" "}
+                      QuickNote{" "}
                     </Typography>
                     is your pocket-sized digital notepad, designed to capture your thoughts, ideas, and lists
                     effortlessly. In today's fast-paced world, it's essential to have a tool that keeps up with your
@@ -36,7 +36,7 @@ const AboutUs: React.FC = () => {
                 </Box>
                 <Box mb={2}>
                   <Typography variant="body2">
-                    With QuikNote, you can jot down anything, anytime, anywhere. Whether it's a brilliant idea, a
+                    With QuickNote, you can jot down anything, anytime, anywhere. Whether it's a brilliant idea, a
                     shopping list, or a simple reminder, our app is your go-to companion. We believe in simplicity and
                     efficiency, so we've created a clean, intuitive interface that lets you focus on what matters most -
                     your notes.
@@ -50,7 +50,7 @@ const AboutUs: React.FC = () => {
                 </Box>
                 <Box mb={2}>
                   <Typography variant="body2">
-                    Join millions of users who have discovered the power of QuikNote. Exlore now and experience the
+                    Join millions of users who have discovered the power of QuickNote. Exlore now and experience the
                     difference!
                   </Typography>
                 </Box>

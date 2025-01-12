@@ -44,7 +44,7 @@ const Home: React.FC = () => {
       <Box py={2} display="flex" flexDirection="row" justifyContent="space-between" alignItems="center" gap={4}>
         <Box>
           <StyledLink to="/#">
-            <Typography variant="h5">QuikNotes</Typography>
+            <Typography variant="h5">QuickNotes</Typography>
           </StyledLink>
         </Box>
 
@@ -111,12 +111,12 @@ const Home: React.FC = () => {
       <Container maxWidth="md">
         <Box py={8}>
           <Typography variant="h2" fontWeight={500} textAlign="center">
-            QuikNotes
+            QuickNotes
           </Typography>
           <Typography mt={2} textAlign="center">
-            QuikNote is your pocket-sized digital notepad in the cloud. Jot down quick ideas, create to-do lists, or
+            QuickNote is your pocket-sized digital notepad in the cloud. Jot down quick ideas, create to-do lists, or
             save important information effortlessly. Access your notes anytime, anywhere from your computer, smartphone,
-            or tablet. With QuikNote, your thoughts are always just a tap away, ensuring they're never lost or
+            or tablet. With QuickNote, your thoughts are always just a tap away, ensuring they're never lost or
             forgotten.
           </Typography>
           <Box mt={4} display="flex" justifyContent="center" gap={2}>
@@ -145,10 +145,10 @@ const Home: React.FC = () => {
               <CardContent>
                 <DrawOutlinedIcon fontSize="large" color="primary" />
                 <Typography variant="h6" fontWeight={500}>
-                  QuikDraw
+                  QuickDraw
                 </Typography>
                 <Typography variant="body2" my={2}>
-                  QuikDraw is your pocket-sized digital freeform board to instantly sketch your ideas and thoughts in
+                  QuickDraw is your pocket-sized digital freeform board to instantly sketch your ideas and thoughts in
                   the cloud.
                 </Typography>
               </CardContent>
@@ -164,10 +164,10 @@ const Home: React.FC = () => {
               <CardContent>
                 <DesignServicesOutlinedIcon fontSize="large" color="secondary" />
                 <Typography variant="h6" fontWeight={500}>
-                  QuikDesign
+                  QuickDesign
                 </Typography>
                 <Typography variant="body2" my={2}>
-                  QuikDraw is an industry grade design tool to plot your imagination into design in a collaborative way
+                  QuickDraw is an industry grade design tool to plot your imagination into design in a collaborative way
                   in the cloud.
                 </Typography>
               </CardContent>
@@ -183,10 +183,10 @@ const Home: React.FC = () => {
               <CardContent>
                 <ArchitectureOutlinedIcon fontSize="large" color="warning" />
                 <Typography variant="h6" fontWeight={500}>
-                  QuikJam
+                  QuickJam
                 </Typography>
                 <Typography variant="body2" my={2}>
-                  QuikJam is a light-weight application to plot business model and software architectural diagrams in a
+                  QuickJam is a light-weight application to plot business model and software architectural diagrams in a
                   collaborative way in the cloud.
                 </Typography>
               </CardContent>
@@ -342,7 +342,7 @@ const Home: React.FC = () => {
             <Box>
               <StyledLink to="/#">
                 <Typography variant="h4" display="inline-block">
-                  QuikNotes
+                  QuickNotes
                 </Typography>
               </StyledLink>
 
@@ -399,29 +399,21 @@ const Home: React.FC = () => {
                 <li>
                   <StyledLink to="/">
                     <Typography variant="body2" sx={{ "&:hover": { textDecoration: "underline" } }}>
-                      QuikNote
+                      QuickNote
                     </Typography>
                   </StyledLink>
                 </li>
                 <li>
-                  <StyledLink to="/quikdraw">
+                  <StyledLink to="/Quickdesgin">
                     <Typography variant="body2" sx={{ "&:hover": { textDecoration: "underline" } }}>
-                      Our team
-                    </Typography>
-                  </StyledLink>
-                </li>
-
-                <li>
-                  <StyledLink to="/quikdesgin">
-                    <Typography variant="body2" sx={{ "&:hover": { textDecoration: "underline" } }}>
-                      QuikDesign
+                      QuickDesign
                     </Typography>
                   </StyledLink>
                 </li>
                 <li>
-                  <StyledLink to="/quikjam">
+                  <StyledLink to="/Quickjam">
                     <Typography variant="body2" sx={{ "&:hover": { textDecoration: "underline" } }}>
-                      QuikJam
+                      QuickJam
                     </Typography>
                   </StyledLink>
                 </li>

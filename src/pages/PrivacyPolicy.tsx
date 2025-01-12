@@ -10,7 +10,7 @@ const PrivacyPolicy: React.FC = () => {
           <Box textAlign="center">
             <StyledLink to="/#">
               <Typography variant="h4" display="inline-block">
-                QuikNotes
+                QuickNotes
               </Typography>
             </StyledLink>
             <Typography variant="body2" textAlign="center">
@@ -79,7 +79,7 @@ const PrivacyPolicy: React.FC = () => {
                   </Typography>
                   <Typography variant="body2">
                     You have the right to access, correct, or delete your documents. To exercise these rights, please
-                    contact us at support@quiknote.com
+                    contact us at support@quicknote.com
                   </Typography>
                 </Box>
                 <Box mb={2}>

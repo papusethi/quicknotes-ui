@@ -53,7 +53,7 @@ const Header: React.FC = () => {
           <Box>
             <StyledLink to="/dashboard">
               <Typography variant="h5" display="inline-block">
-                QuikNotes
+                QuickNotes
               </Typography>
             </StyledLink>
           </Box>
